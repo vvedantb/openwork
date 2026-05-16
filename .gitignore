@@ -1,0 +1,16 @@
+node_modules
+dist
+.env
+.env.local
+.env.*.local
+*.log
+*.tsbuildinfo
+.DS_Store
+.turbo
+.vite
+.cache
+apps/*/node_modules
+apps/*/dist
+packages/*/node_modules
+packages/*/dist
+packages/backend/convex/_generated
