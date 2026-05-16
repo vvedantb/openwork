@@ -21,8 +21,12 @@ export function SlideList({
   onDelete,
 }: SlideListProps) {
   return (
-    <div className="slide-list">
-      <button className="btn primary" onClick={onAdd}>
+    <div className="pane-body tight">
+      <button
+        className="btn primary"
+        onClick={onAdd}
+        style={{ justifyContent: "center", marginBottom: 6 }}
+      >
         + Add slide
       </button>
       {slides.map((slide, index) => (
@@ -31,8 +35,10 @@ export function SlideList({
           className={`slide-thumb ${slide._id === activeSlideId ? "active" : ""}`}
           onClick={() => onSelect(slide._id)}
         >
-          <span className="index">{index + 1}</span>
-          <span className="mini">
+          <span className="slide-thumb-index">
+            {String(index + 1).padStart(2, "0")}
+          </span>
+          <span className="slide-thumb-frame">
             <SlidePlayer
               slide={slide}
               background={background}
@@ -45,6 +51,7 @@ export function SlideList({
       {slides.length > 1 && activeSlideId ? (
         <button
           className="btn danger"
+          style={{ justifyContent: "center", marginTop: 8 }}
           onClick={() => {
             if (confirm("Delete this slide?")) onDelete(activeSlideId);
           }}

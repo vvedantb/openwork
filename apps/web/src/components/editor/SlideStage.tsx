@@ -47,9 +47,10 @@ export function SlideStage({
       style={{
         position: "relative",
         width: "100%",
-        aspectRatio: "16 / 9",
-        maxHeight: "100%",
-        maxWidth: "100%",
+        height: "100%",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
       }}
     >
       <div style={{ position: "absolute", inset: 0 }}>
@@ -85,13 +86,14 @@ export function SlideStage({
                 pointerEvents: "auto",
                 cursor: "text",
                 outline: isEditing
-                  ? "2px solid var(--accent)"
-                  : "1px dashed rgba(255,255,255,0.08)",
-                borderRadius: 4,
+                  ? `2px solid ${accent}`
+                  : "1px dashed rgba(15, 15, 15, 0.16)",
+                borderRadius: 2,
                 padding: 2,
-                background: isEditing ? "rgba(0,0,0,0.4)" : "transparent",
+                background: isEditing ? "rgba(15, 15, 15, 0.55)" : "transparent",
                 display: "flex",
                 alignItems: element.kind === "heading" ? "center" : "flex-start",
+                transition: "outline-color 160ms",
               }}
             >
               {isEditing ? (
@@ -116,7 +118,8 @@ export function SlideStage({
                     color: element.color,
                     outline: "none",
                     resize: "none",
-                    fontWeight: element.kind === "heading" ? 800 : 400,
+                    fontWeight: element.kind === "heading" ? 700 : 400,
+                    fontFamily: "var(--font-display)",
                   }}
                 />
               ) : null}
@@ -125,16 +128,20 @@ export function SlideStage({
         })}
       </div>
       <div
-        className="muted"
         style={{
           position: "absolute",
-          bottom: 6,
-          right: 10,
-          fontSize: 11,
+          bottom: 10,
+          right: 14,
+          fontFamily: "var(--font-mono)",
+          fontSize: 10,
+          letterSpacing: "0.14em",
+          textTransform: "uppercase",
+          color: "rgba(242, 237, 227, 0.55)",
           pointerEvents: "none",
+          mixBlendMode: "difference",
         }}
       >
-        Double-click text to edit
+        Double-click to edit
       </div>
     </div>
   );

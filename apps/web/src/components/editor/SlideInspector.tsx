@@ -80,101 +80,180 @@ export function SlideInspector({ slide, accent, onUpdate }: SlideInspectorProps)
   }
 
   return (
-    <div className="card" style={{ display: "flex", flexDirection: "column", gap: 12, overflow: "auto" }}>
-      <div className="field">
-        <label>Slide title</label>
-        <input
-          value={titleDraft}
-          onChange={(event) => setTitleDraft(event.target.value)}
-          onBlur={() => {
-            if (titleDraft !== slide.title) onUpdate({ title: titleDraft });
-          }}
-        />
-      </div>
-
-      <div className="field">
-        <label>Transition</label>
-        <select
-          value={slide.transition}
-          onChange={(event) =>
-            onUpdate({ transition: event.target.value as SlideTransition })
-          }
-        >
-          {TRANSITIONS.map((option) => (
-            <option key={option} value={option}>
-              {option}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      <div className="field">
-        <label>Slide background (overrides deck)</label>
-        <div className="row" style={{ gap: 8 }}>
+    <>
+      <div className="inspector-section">
+        <p className="section-label">Slide</p>
+        <div className="field">
+          <span className="field-label">Title</span>
           <input
-            type="color"
-            className="color-input"
-            value={slide.background ?? "#0b1020"}
-            onChange={(event) => onUpdate({ background: event.target.value })}
+            className="input"
+            value={titleDraft}
+            onChange={(event) => setTitleDraft(event.target.value)}
+            onBlur={() => {
+              if (titleDraft !== slide.title) onUpdate({ title: titleDraft });
+            }}
+            placeholder="Untitled slide"
           />
-          {slide.background ? (
-            <button
-              className="btn"
-              onClick={() => onUpdate({ background: "" })}
-              title="Use deck background"
-            >
-              Clear
-            </button>
-          ) : (
-            <span className="muted" style={{ fontSize: 12 }}>
-              Using deck background
+        </div>
+        <div className="field">
+          <span className="field-label">Transition</span>
+          <select
+            className="input"
+            value={slide.transition}
+            onChange={(event) =>
+              onUpdate({ transition: event.target.value as SlideTransition })
+            }
+          >
+            {TRANSITIONS.map((option) => (
+              <option key={option} value={option}>
+                {option}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="field">
+          <span className="field-label">Background override</span>
+          <div className="row" style={{ gap: 8 }}>
+            <input
+              type="color"
+              className="color-input"
+              value={slide.background ?? "#0b1020"}
+              onChange={(event) => onUpdate({ background: event.target.value })}
+            />
+            {slide.background ? (
+              <button
+                className="btn ghost"
+                onClick={() => onUpdate({ background: "" })}
+                title="Use deck background"
+              >
+                Clear
+              </button>
+            ) : (
+              <span className="muted" style={{ fontSize: 12 }}>
+                Using deck background
+              </span>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <div className="inspector-section">
+        <p className="section-label">Add element</p>
+        <div className="tool-chip-grid">
+          <button className="tool-chip" onClick={addHeading} title="Heading">
+            <span className="tool-chip-icon">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path
+                  d="M3 3v10M13 3v10M3 8h10"
+                  stroke="currentColor"
+                  strokeWidth="1.6"
+                  strokeLinecap="square"
+                />
+              </svg>
             </span>
+            Heading
+          </button>
+          <button className="tool-chip" onClick={addText} title="Body text">
+            <span className="tool-chip-icon">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path
+                  d="M2 4h12M2 8h12M2 12h8"
+                  stroke="currentColor"
+                  strokeWidth="1.4"
+                  strokeLinecap="square"
+                />
+              </svg>
+            </span>
+            Text
+          </button>
+          <button
+            className="tool-chip"
+            onClick={() => addShape("rectangle")}
+            title="Rectangle"
+          >
+            <span className="tool-chip-icon">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <rect
+                  x="2"
+                  y="3"
+                  width="12"
+                  height="10"
+                  stroke="currentColor"
+                  strokeWidth="1.4"
+                  fill="none"
+                />
+              </svg>
+            </span>
+            Rect
+          </button>
+          <button
+            className="tool-chip"
+            onClick={() => addShape("circle")}
+            title="Circle"
+          >
+            <span className="tool-chip-icon">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <circle
+                  cx="8"
+                  cy="8"
+                  r="5.5"
+                  stroke="currentColor"
+                  strokeWidth="1.4"
+                  fill="none"
+                />
+              </svg>
+            </span>
+            Circle
+          </button>
+          <button
+            className="tool-chip"
+            onClick={() => addShape("triangle")}
+            title="Triangle"
+          >
+            <span className="tool-chip-icon">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path
+                  d="M8 2.5 14 13H2L8 2.5z"
+                  stroke="currentColor"
+                  strokeWidth="1.4"
+                  fill="none"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </span>
+            Tri
+          </button>
+        </div>
+      </div>
+
+      <div className="inspector-section">
+        <p className="section-label">
+          Elements <span className="muted">({slide.elements.length})</span>
+        </p>
+        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          {slide.elements.length === 0 ? (
+            <p className="muted" style={{ fontSize: 13, margin: 0 }}>
+              No elements yet. Add a heading or shape to get started.
+            </p>
+          ) : (
+            slide.elements.map((element) => (
+              <ElementRow
+                key={element.id}
+                element={element}
+                onChange={(next) =>
+                  patchElements(
+                    slide.elements.map((current) =>
+                      current.id === next.id ? next : current,
+                    ),
+                  )
+                }
+                onRemove={() => removeElement(element.id)}
+              />
+            ))
           )}
         </div>
       </div>
-
-      <div className="divider" />
-
-      <div className="row" style={{ flexWrap: "wrap" }}>
-        <button className="btn" onClick={addHeading}>
-          + Heading
-        </button>
-        <button className="btn" onClick={addText}>
-          + Text
-        </button>
-        <button className="btn" onClick={() => addShape("rectangle")}>
-          + Rect
-        </button>
-        <button className="btn" onClick={() => addShape("circle")}>
-          + Circle
-        </button>
-        <button className="btn" onClick={() => addShape("triangle")}>
-          + Triangle
-        </button>
-      </div>
-
-      <div className="divider" />
-
-      <div className="field">
-        <label>Elements ({slide.elements.length})</label>
-        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-          {slide.elements.map((element) => (
-            <ElementRow
-              key={element.id}
-              element={element}
-              onChange={(next) =>
-                patchElements(
-                  slide.elements.map((current) =>
-                    current.id === next.id ? next : current,
-                  ),
-                )
-              }
-              onRemove={() => removeElement(element.id)}
-            />
-          ))}
-        </div>
-      </div>
-    </div>
+    </>
   );
 }
 
@@ -186,24 +265,20 @@ type ElementRowProps = {
 
 function ElementRow({ element, onChange, onRemove }: ElementRowProps) {
   return (
-    <div
-      className="card"
-      style={{
-        padding: 10,
-        gap: 8,
-        display: "flex",
-        flexDirection: "column",
-      }}
-    >
-      <div className="row spread">
-        <strong style={{ fontSize: 12, textTransform: "uppercase", letterSpacing: "0.06em" }}>
-          {element.kind === "shape" ? `shape · ${element.shape}` : element.kind}
-        </strong>
-        <button className="btn danger" onClick={onRemove}>
+    <div className="element-row">
+      <div className="element-row-head">
+        <span className="element-row-kind">
+          {element.kind === "shape" ? `Shape · ${element.shape}` : element.kind}
+        </span>
+        <button
+          className="btn danger"
+          onClick={onRemove}
+          style={{ padding: "4px 10px", fontSize: 11 }}
+        >
           Remove
         </button>
       </div>
-      <div className="row" style={{ gap: 6, flexWrap: "wrap" }}>
+      <div className="field-row four">
         <NumberField
           label="X"
           value={element.x}
@@ -226,14 +301,14 @@ function ElementRow({ element, onChange, onRemove }: ElementRowProps) {
         />
       </div>
       {element.kind === "heading" || element.kind === "text" ? (
-        <div className="row" style={{ gap: 6 }}>
+        <div className="field-row">
           <NumberField
             label="Font"
             value={element.fontSize}
             onChange={(value) => onChange({ ...element, fontSize: value })}
           />
-          <div className="field" style={{ flex: 1 }}>
-            <label>Colour</label>
+          <div className="field">
+            <span className="field-label">Colour</span>
             <input
               type="color"
               className="color-input"
@@ -247,7 +322,7 @@ function ElementRow({ element, onChange, onRemove }: ElementRowProps) {
       ) : null}
       {element.kind === "shape" ? (
         <div className="field">
-          <label>Fill</label>
+          <span className="field-label">Fill</span>
           <input
             type="color"
             className="color-input"
@@ -272,10 +347,11 @@ function NumberField({
   onChange: (value: number) => void;
 }) {
   return (
-    <div className="field" style={{ width: 70 }}>
-      <label>{label}</label>
+    <div className="field">
+      <span className="field-label">{label}</span>
       <input
         type="number"
+        className="input mono"
         value={value}
         onChange={(event) => {
           const parsed = Number(event.target.value);

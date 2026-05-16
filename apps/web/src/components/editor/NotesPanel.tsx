@@ -14,18 +14,14 @@ export function NotesPanel({ slide, onChange }: NotesPanelProps) {
   }, [slide._id, slide.notes]);
 
   return (
-    <div className="card">
-      <div className="field">
-        <label>Speaker notes</label>
-        <textarea
-          value={draft}
-          onChange={(event) => setDraft(event.target.value)}
-          onBlur={() => {
-            if (draft !== slide.notes) onChange(draft);
-          }}
-          placeholder="Notes that only you see during presentation mode"
-        />
-      </div>
-    </div>
+    <textarea
+      className="notes-textarea"
+      value={draft}
+      onChange={(event) => setDraft(event.target.value)}
+      onBlur={() => {
+        if (draft !== slide.notes) onChange(draft);
+      }}
+      placeholder="Write the words you'll say. Only you see them in present mode."
+    />
   );
 }

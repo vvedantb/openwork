@@ -26,7 +26,7 @@ function PresentationsPage() {
   async function handleCreate() {
     if (!isAuthenticated) {
       setError(
-        "Convex hasn't received your Clerk token yet. Check that you created a Clerk JWT template named \"convex\" and that CLERK_JWT_ISSUER_DOMAIN is set in your Convex deployment.",
+        "Convex has not received your Clerk token yet. Check that you created a Clerk JWT template named \"convex\" and that CLERK_JWT_ISSUER_DOMAIN is set in your Convex deployment.",
       );
       return;
     }
@@ -44,12 +44,15 @@ function PresentationsPage() {
   }
 
   return (
-    <div className="page">
-      <div className="row spread">
-        <div>
-          <h2 style={{ margin: 0 }}>Your decks</h2>
-          <p className="muted" style={{ margin: "4px 0 0" }}>
-            Create a deck and start building slides.
+    <div className="page stagger">
+      <div className="page-head">
+        <div className="page-head-text">
+          <p className="eyebrow">Library — All decks</p>
+          <h1 className="page-title">
+            Your <em>decks</em>.
+          </h1>
+          <p className="muted" style={{ margin: 0, fontSize: 16 }}>
+            Open a deck to keep editing, or start a fresh one. Drafts auto-save.
           </p>
         </div>
         <button
@@ -57,39 +60,38 @@ function PresentationsPage() {
           onClick={handleCreate}
           disabled={creating || authLoading}
         >
-          {creating ? "Creating..." : authLoading ? "Connecting..." : "New deck"}
+          {creating ? "Creating..." : authLoading ? "Connecting..." : "+ New deck"}
         </button>
       </div>
 
       {error ? (
-        <div
-          className="card"
-          style={{ borderColor: "var(--danger)", color: "var(--danger)" }}
-        >
+        <div className="alert">
           <strong>Could not create deck</strong>
-          <p style={{ margin: "6px 0 0", whiteSpace: "pre-wrap" }}>{error}</p>
+          <p>{error}</p>
         </div>
       ) : null}
 
       {presentations === undefined ? (
-        <p className="muted">Loading...</p>
+        <p className="muted">Loading library...</p>
       ) : presentations.length === 0 ? (
-        <div className="card center" style={{ padding: 48 }}>
-          <div>
-            <p className="muted" style={{ marginTop: 0 }}>
-              Nothing here yet.
-            </p>
-            <button className="btn primary" onClick={handleCreate} disabled={creating}>
-              Create your first deck
-            </button>
-          </div>
+        <div className="empty-state">
+          <p className="eyebrow">Nothing here yet</p>
+          <h3>A blank canvas, waiting.</h3>
+          <p>
+            Start your first deck and the library will fill up with thumbnails,
+            titles, and dates.
+          </p>
+          <button className="btn primary" onClick={handleCreate} disabled={creating}>
+            {creating ? "Creating..." : "Create your first deck"}
+          </button>
         </div>
       ) : (
-        <div className="grid">
-          {presentations.map((deck) => (
+        <div className="deck-grid">
+          {presentations.map((deck, index) => (
             <DeckCard
               key={deck._id}
               deckId={deck._id}
+              index={index + 1}
               title={deck.title}
               background={deck.background}
               accent={deck.accent}
@@ -105,6 +107,7 @@ function PresentationsPage() {
 
 type DeckCardProps = {
   deckId: import("@/types").PresentationId;
+  index: number;
   title: string;
   background: string;
   accent: string;
@@ -114,6 +117,7 @@ type DeckCardProps = {
 
 function DeckCard({
   deckId,
+  index,
   title,
   background,
   accent,
@@ -124,15 +128,17 @@ function DeckCard({
     presentationId: deckId,
   });
   const firstSlide: SlideDoc | undefined = slides?.[0];
+  const indexLabel = String(index).padStart(2, "0");
 
   return (
-    <div className="card deck-card">
+    <div className="deck-card">
       <Link
         to="/presentations/$id"
         params={{ id: deckId }}
-        style={{ color: "inherit" }}
+        style={{ display: "block" }}
       >
         <div className="thumb">
+          <span className="deck-index">No. {indexLabel}</span>
           {firstSlide ? (
             <SlidePlayer
               slide={firstSlide}
@@ -142,19 +148,20 @@ function DeckCard({
             />
           ) : null}
         </div>
-        <div className="title" style={{ marginTop: 8 }}>
+        <div className="title" style={{ marginTop: 14 }}>
           {title}
         </div>
-        <div className="meta">
-          {slides ? `${slides.length} slides` : "..."} · Updated {" "}
-          {new Date(updatedAt).toLocaleString()}
+        <div className="meta" style={{ marginTop: 6 }}>
+          <span>{slides ? `${slides.length} slides` : "—"}</span>
+          <span className="dot">·</span>
+          <span>{formatRelative(updatedAt)}</span>
         </div>
       </Link>
-      <div className="row spread">
+      <div className="deck-card-actions">
         <Link
           to="/presentations/$id/present"
           params={{ id: deckId }}
-          className="btn"
+          className="btn ghost"
         >
           Present
         </Link>
@@ -171,4 +178,20 @@ function DeckCard({
       </div>
     </div>
   );
+}
+
+function formatRelative(timestamp: number): string {
+  const diff = Date.now() - timestamp;
+  const minute = 60_000;
+  const hour = 60 * minute;
+  const day = 24 * hour;
+  if (diff < minute) return "just now";
+  if (diff < hour) return `${Math.floor(diff / minute)}m ago`;
+  if (diff < day) return `${Math.floor(diff / hour)}h ago`;
+  if (diff < 7 * day) return `${Math.floor(diff / day)}d ago`;
+  return new Date(timestamp).toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
 }

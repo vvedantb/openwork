@@ -109,14 +109,20 @@ function PresentPage() {
   }, []);
 
   if (presentation === undefined || slides === undefined) {
-    return <div className="page muted">Loading...</div>;
+    return (
+      <div className="present-shell">
+        <p style={{ color: "var(--type-ink-muted)" }}>Loading...</p>
+      </div>
+    );
   }
   if (presentation === null || !slides || slides.length === 0) {
     return (
-      <div className="page center">
-        <div>
-          <p>This deck has no slides.</p>
-          <button className="btn" onClick={exit}>
+      <div className="present-shell">
+        <div style={{ textAlign: "center", color: "var(--type-ink)" }}>
+          <p style={{ fontFamily: "var(--font-display)", fontStyle: "italic", fontSize: 24 }}>
+            This deck has no slides.
+          </p>
+          <button className="present-ctrl" onClick={exit}>
             Back to editor
           </button>
         </div>
@@ -129,77 +135,75 @@ function PresentPage() {
 
   return (
     <div ref={shellRef} className="present-shell">
+      <div className="present-deck-label">
+        <span className="brand-mark" style={{ width: 14, height: 14 }} aria-hidden="true" />
+        {presentation.title}
+      </div>
+
       <div className="present-stage">
-        <div
-          style={{
-            width: "100%",
-            height: "100%",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <div
-            style={{
-              width: "min(100%, calc(100vh * 16 / 9))",
-              aspectRatio: "16 / 9",
-            }}
-          >
-            <SlidePlayer
-              key={currentSlide._id}
-              slide={currentSlide}
-              background={presentation.background}
-              accent={presentation.accent}
-              autoPlay
-            />
-          </div>
+        <div className="present-frame">
+          <SlidePlayer
+            key={currentSlide._id}
+            slide={currentSlide}
+            background={presentation.background}
+            accent={presentation.accent}
+            autoPlay
+          />
         </div>
 
         {notesOpen && currentSlide.notes ? (
           <div className="present-notes">
-            <div className="muted" style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 6 }}>
-              Speaker notes
-            </div>
-            <div>{currentSlide.notes}</div>
+            <p className="present-notes-label">Speaker notes</p>
+            <p className="present-notes-body">{currentSlide.notes}</p>
           </div>
         ) : null}
 
         <div className="present-counter">
-          {safeIndex + 1} / {slides.length}
+          <strong>{String(safeIndex + 1).padStart(2, "0")}</strong>
+          {" / "}
+          {String(slides.length).padStart(2, "0")}
         </div>
 
         <div className="present-controls">
           <button
-            className="btn"
+            className="present-ctrl"
             onClick={goPrev}
             disabled={safeIndex === 0}
             title="Previous (←)"
+            aria-label="Previous slide"
           >
-            ← Prev
+            ←
           </button>
           <button
-            className="btn"
+            className="present-ctrl"
             onClick={goNext}
             disabled={safeIndex === slides.length - 1}
             title="Next (→)"
+            aria-label="Next slide"
           >
-            Next →
+            →
           </button>
+          <span className="present-ctrl-divider" aria-hidden="true" />
           <button
-            className="btn"
+            className="present-ctrl"
             onClick={() => setNotesOpen((value) => !value)}
             title="Toggle notes (N)"
           >
-            {notesOpen ? "Hide notes" : "Show notes"}
+            {notesOpen ? "Hide notes" : "Notes"}
           </button>
           <button
-            className="btn"
+            className="present-ctrl"
             onClick={() => void toggleFullscreen()}
             title="Fullscreen (F)"
           >
-            {isFullscreen ? "Exit fullscreen" : "Fullscreen"}
+            {isFullscreen ? "Windowed" : "Fullscreen"}
           </button>
-          <button className="btn danger" onClick={exit} title="Exit (Esc)">
+          <span className="present-ctrl-divider" aria-hidden="true" />
+          <button
+            className="present-ctrl accent"
+            onClick={exit}
+            title="Exit (Esc)"
+          >
             Exit
           </button>
         </div>

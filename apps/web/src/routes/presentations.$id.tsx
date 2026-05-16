@@ -47,15 +47,21 @@ function EditorPage() {
   }, [slides, activeSlideId]);
 
   if (presentation === undefined || slides === undefined) {
-    return <div className="page muted">Loading deck...</div>;
+    return (
+      <div className="page">
+        <p className="muted">Loading deck...</p>
+      </div>
+    );
   }
   if (presentation === null) {
     return (
-      <div className="page center">
-        <div>
-          <p>This deck does not exist or you do not have access.</p>
-          <Link to="/presentations" className="btn">
-            Back to decks
+      <div className="page">
+        <div className="empty-state">
+          <p className="eyebrow">Not found</p>
+          <h3>This deck is unavailable.</h3>
+          <p>It may have been deleted, or you may not have access.</p>
+          <Link to="/presentations" className="btn primary">
+            Back to library
           </Link>
         </div>
       </div>
@@ -65,44 +71,36 @@ function EditorPage() {
   const activeSlide: SlideDoc | undefined = slides.find(
     (s) => s._id === activeSlideId,
   );
+  const activeIndex = activeSlide
+    ? slides.findIndex((s) => s._id === activeSlide._id) + 1
+    : 0;
 
   return (
-    <div className="page" style={{ padding: 0, overflow: "hidden" }}>
-      <div
-        className="row spread"
-        style={{
-          padding: "10px 16px",
-          borderBottom: "1px solid var(--border)",
-        }}
-      >
-        <div className="row" style={{ gap: 10 }}>
-          <Link to="/presentations" className="btn">
-            ← Decks
+    <div className="editor-shell">
+      <div className="editor-bar">
+        <div className="editor-bar-left">
+          <Link to="/presentations" className="btn ghost" title="Back to library">
+            ← Library
           </Link>
-          <input
-            value={titleDraft}
-            onChange={(event) => setTitleDraft(event.target.value)}
-            onBlur={() => {
-              if (titleDraft && titleDraft !== presentation.title) {
-                renamePresentation({ id: presentation._id, title: titleDraft });
-              }
-            }}
-            style={{
-              background: "transparent",
-              border: "1px solid transparent",
-              color: "var(--text)",
-              fontSize: 18,
-              fontWeight: 600,
-              padding: "6px 10px",
-              borderRadius: 8,
-              minWidth: 220,
-            }}
-            onFocus={(event) => {
-              event.currentTarget.style.borderColor = "var(--border)";
-            }}
-          />
+          <div className="editor-bar-meta">
+            <span className="crumb">Deck — {slides.length} slides</span>
+            <input
+              className="editor-title-input"
+              value={titleDraft}
+              onChange={(event) => setTitleDraft(event.target.value)}
+              onBlur={() => {
+                if (titleDraft && titleDraft !== presentation.title) {
+                  renamePresentation({ id: presentation._id, title: titleDraft });
+                }
+              }}
+              placeholder="Untitled deck"
+            />
+          </div>
         </div>
-        <div className="row" style={{ gap: 8 }}>
+        <div className="editor-bar-right">
+          <div className="field-label" style={{ marginRight: 4 }}>
+            Theme
+          </div>
           <input
             type="color"
             className="color-input"
@@ -134,63 +132,95 @@ function EditorPage() {
             params={{ id: presentation._id }}
             className="btn primary"
           >
-            ▶ Present
+            Present →
           </Link>
         </div>
       </div>
 
-      <div className="editor">
-        <SlideList
-          slides={slides}
-          activeSlideId={activeSlideId}
-          background={presentation.background}
-          accent={presentation.accent}
-          onSelect={setActiveSlideId}
-          onAdd={async () => {
-            const newId = await addSlide({ presentationId: presentation._id });
-            setActiveSlideId(newId);
-          }}
-          onDelete={(slideId) => removeSlide({ id: slideId })}
-        />
-
-        <div className="stage-wrap">
-          {activeSlide ? (
-            <SlideStage
-              slide={activeSlide}
-              background={presentation.background}
-              accent={presentation.accent}
-              onUpdate={(patch) =>
-                updateSlide({ id: activeSlide._id, ...patch })
-              }
-            />
-          ) : (
-            <p className="muted">No slide selected.</p>
-          )}
+      <div className="editor-grid">
+        <div className="editor-pane pane-list">
+          <div className="pane-header">
+            <span className="pane-header-title">Slides</span>
+            <span
+              className="pane-header-title"
+              style={{ fontVariantNumeric: "tabular-nums" }}
+            >
+              {activeIndex}/{slides.length}
+            </span>
+          </div>
+          <SlideList
+            slides={slides}
+            activeSlideId={activeSlideId}
+            background={presentation.background}
+            accent={presentation.accent}
+            onSelect={setActiveSlideId}
+            onAdd={async () => {
+              const newId = await addSlide({ presentationId: presentation._id });
+              setActiveSlideId(newId);
+            }}
+            onDelete={(slideId) => removeSlide({ id: slideId })}
+          />
         </div>
 
-        <div className="side-panel">
-          {activeSlide ? (
-            <SlideInspector
-              slide={activeSlide}
-              accent={presentation.accent}
-              onUpdate={(patch) =>
-                updateSlide({ id: activeSlide._id, ...patch })
-              }
-            />
-          ) : (
-            <p className="muted">Add a slide to begin.</p>
-          )}
+        <div className="editor-pane pane-stage">
+          <div className="pane-header">
+            <span className="pane-header-title">Canvas</span>
+            <span className="pane-header-title">
+              {activeSlide?.title ?? "—"}
+            </span>
+          </div>
+          <div className="stage-wrap">
+            {activeSlide ? (
+              <div className="stage-frame">
+                <SlideStage
+                  slide={activeSlide}
+                  background={presentation.background}
+                  accent={presentation.accent}
+                  onUpdate={(patch) =>
+                    updateSlide({ id: activeSlide._id, ...patch })
+                  }
+                />
+              </div>
+            ) : (
+              <p className="muted">No slide selected.</p>
+            )}
+          </div>
         </div>
 
-        <div className="notes-panel">
-          {activeSlide ? (
-            <NotesPanel
-              slide={activeSlide}
-              onChange={(notes) =>
-                updateSlide({ id: activeSlide._id, notes })
-              }
-            />
-          ) : null}
+        <div className="editor-pane pane-inspector">
+          <div className="pane-header">
+            <span className="pane-header-title">Inspector</span>
+          </div>
+          <div className="pane-body">
+            {activeSlide ? (
+              <SlideInspector
+                slide={activeSlide}
+                accent={presentation.accent}
+                onUpdate={(patch) =>
+                  updateSlide({ id: activeSlide._id, ...patch })
+                }
+              />
+            ) : (
+              <p className="muted">Add a slide to begin.</p>
+            )}
+          </div>
+        </div>
+
+        <div className="editor-pane pane-notes">
+          <div className="pane-header">
+            <span className="pane-header-title">Speaker notes</span>
+            <span className="pane-header-title">Only you see this</span>
+          </div>
+          <div className="pane-body">
+            {activeSlide ? (
+              <NotesPanel
+                slide={activeSlide}
+                onChange={(notes) =>
+                  updateSlide({ id: activeSlide._id, notes })
+                }
+              />
+            ) : null}
+          </div>
         </div>
       </div>
     </div>
