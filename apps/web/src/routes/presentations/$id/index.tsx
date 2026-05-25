@@ -8,7 +8,7 @@ import { SlideStage } from "@/components/editor/SlideStage";
 import { SlideInspector } from "@/components/editor/SlideInspector";
 import { NotesPanel } from "@/components/editor/NotesPanel";
 
-export const Route = createFileRoute("/presentations/$id")({
+export const Route = createFileRoute("/presentations/$id/")({
   beforeLoad: ({ context }) => {
     if (context.auth.isLoaded && !context.auth.isSignedIn) {
       throw redirect({ to: "/" });
