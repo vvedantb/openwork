@@ -1,5 +1,6 @@
 import { Player } from "@remotion/player";
 import { useMemo } from "react";
+import { SLIDE_DURATION_IN_FRAMES, SLIDE_FPS } from "@/remotion/constants";
 import { SlideComposition } from "@/remotion/SlideComposition";
 import { SLIDE_HEIGHT, SLIDE_WIDTH, type SlideDoc } from "@/types";
 
@@ -12,9 +13,6 @@ export type SlidePlayerProps = {
   clickToPlay?: boolean;
   style?: React.CSSProperties;
 };
-
-const FPS = 30;
-const DURATION_IN_FRAMES = 90;
 
 export function SlidePlayer({
   slide,
@@ -34,8 +32,8 @@ export function SlidePlayer({
     <Player
       key={slide._id}
       component={SlideComposition}
-      durationInFrames={DURATION_IN_FRAMES}
-      fps={FPS}
+      durationInFrames={SLIDE_DURATION_IN_FRAMES}
+      fps={SLIDE_FPS}
       compositionWidth={SLIDE_WIDTH}
       compositionHeight={SLIDE_HEIGHT}
       inputProps={inputProps}

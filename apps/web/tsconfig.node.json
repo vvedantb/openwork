@@ -9,7 +9,16 @@
     "strict": true,
     "noEmit": true,
     "composite": true,
-    "types": ["node"]
+    "types": ["node"],
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    }
   },
-  "include": ["vite.config.ts"]
+  "include": [
+    "vite.config.ts",
+    "vite-plugin-deck-render.ts",
+    "remotion.config.ts",
+    "scripts/**/*.ts"
+  ]
 }

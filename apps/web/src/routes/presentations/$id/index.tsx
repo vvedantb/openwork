@@ -7,6 +7,7 @@ import { SlideList } from "@/components/editor/SlideList";
 import { SlideStage } from "@/components/editor/SlideStage";
 import { SlideInspector } from "@/components/editor/SlideInspector";
 import { NotesPanel } from "@/components/editor/NotesPanel";
+import { ExportDeckButton } from "@/components/editor/ExportDeckButton";
 
 export const Route = createFileRoute("/presentations/$id/")({
   beforeLoad: ({ context }) => {
@@ -134,6 +135,12 @@ function EditorPage() {
           >
             Present →
           </Link>
+          <ExportDeckButton
+            title={presentation.title}
+            background={presentation.background}
+            accent={presentation.accent}
+            slides={slides}
+          />
         </div>
       </div>
 
