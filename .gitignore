@@ -1,4 +1,5 @@
 node_modules
+.agents/
 dist
 .env
 .env.local
@@ -11,6 +12,7 @@ dist
 .cache
 apps/*/node_modules
 apps/*/dist
+apps/web/out
 packages/*/node_modules
 packages/*/dist
 packages/backend/convex/_generated

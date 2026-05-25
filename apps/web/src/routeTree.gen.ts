@@ -10,9 +10,9 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as PresentationsIndexRouteImport } from './routes/presentations.index'
-import { Route as PresentationsIdRouteImport } from './routes/presentations.$id'
-import { Route as PresentationsIdPresentRouteImport } from './routes/presentations.$id.present'
+import { Route as PresentationsIndexRouteImport } from './routes/presentations/index'
+import { Route as PresentationsIdIndexRouteImport } from './routes/presentations/$id/index'
+import { Route as PresentationsIdPresentIndexRouteImport } from './routes/presentations/$id/present/index'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -24,61 +24,63 @@ const PresentationsIndexRoute = PresentationsIndexRouteImport.update({
   path: '/presentations/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const PresentationsIdRoute = PresentationsIdRouteImport.update({
-  id: '/presentations/$id',
-  path: '/presentations/$id',
+const PresentationsIdIndexRoute = PresentationsIdIndexRouteImport.update({
+  id: '/presentations/$id/',
+  path: '/presentations/$id/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const PresentationsIdPresentRoute = PresentationsIdPresentRouteImport.update({
-  id: '/present',
-  path: '/present',
-  getParentRoute: () => PresentationsIdRoute,
-} as any)
+const PresentationsIdPresentIndexRoute =
+  PresentationsIdPresentIndexRouteImport.update({
+    id: '/presentations/$id/present/',
+    path: '/presentations/$id/present/',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/presentations/$id': typeof PresentationsIdRouteWithChildren
   '/presentations/': typeof PresentationsIndexRoute
-  '/presentations/$id/present': typeof PresentationsIdPresentRoute
+  '/presentations/$id/': typeof PresentationsIdIndexRoute
+  '/presentations/$id/present/': typeof PresentationsIdPresentIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/presentations/$id': typeof PresentationsIdRouteWithChildren
   '/presentations': typeof PresentationsIndexRoute
-  '/presentations/$id/present': typeof PresentationsIdPresentRoute
+  '/presentations/$id': typeof PresentationsIdIndexRoute
+  '/presentations/$id/present': typeof PresentationsIdPresentIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/presentations/$id': typeof PresentationsIdRouteWithChildren
   '/presentations/': typeof PresentationsIndexRoute
-  '/presentations/$id/present': typeof PresentationsIdPresentRoute
+  '/presentations/$id/': typeof PresentationsIdIndexRoute
+  '/presentations/$id/present/': typeof PresentationsIdPresentIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/presentations/$id'
     | '/presentations/'
-    | '/presentations/$id/present'
+    | '/presentations/$id/'
+    | '/presentations/$id/present/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/presentations/$id'
     | '/presentations'
+    | '/presentations/$id'
     | '/presentations/$id/present'
   id:
     | '__root__'
     | '/'
-    | '/presentations/$id'
     | '/presentations/'
-    | '/presentations/$id/present'
+    | '/presentations/$id/'
+    | '/presentations/$id/present/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  PresentationsIdRoute: typeof PresentationsIdRouteWithChildren
   PresentationsIndexRoute: typeof PresentationsIndexRoute
+  PresentationsIdIndexRoute: typeof PresentationsIdIndexRoute
+  PresentationsIdPresentIndexRoute: typeof PresentationsIdPresentIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -97,39 +99,28 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PresentationsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/presentations/$id': {
-      id: '/presentations/$id'
+    '/presentations/$id/': {
+      id: '/presentations/$id/'
       path: '/presentations/$id'
-      fullPath: '/presentations/$id'
-      preLoaderRoute: typeof PresentationsIdRouteImport
+      fullPath: '/presentations/$id/'
+      preLoaderRoute: typeof PresentationsIdIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/presentations/$id/present': {
-      id: '/presentations/$id/present'
-      path: '/present'
-      fullPath: '/presentations/$id/present'
-      preLoaderRoute: typeof PresentationsIdPresentRouteImport
-      parentRoute: typeof PresentationsIdRoute
+    '/presentations/$id/present/': {
+      id: '/presentations/$id/present/'
+      path: '/presentations/$id/present'
+      fullPath: '/presentations/$id/present/'
+      preLoaderRoute: typeof PresentationsIdPresentIndexRouteImport
+      parentRoute: typeof rootRouteImport
     }
   }
 }
 
-interface PresentationsIdRouteChildren {
-  PresentationsIdPresentRoute: typeof PresentationsIdPresentRoute
-}
-
-const PresentationsIdRouteChildren: PresentationsIdRouteChildren = {
-  PresentationsIdPresentRoute: PresentationsIdPresentRoute,
-}
-
-const PresentationsIdRouteWithChildren = PresentationsIdRoute._addFileChildren(
-  PresentationsIdRouteChildren,
-)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  PresentationsIdRoute: PresentationsIdRouteWithChildren,
   PresentationsIndexRoute: PresentationsIndexRoute,
+  PresentationsIdIndexRoute: PresentationsIdIndexRoute,
+  PresentationsIdPresentIndexRoute: PresentationsIdPresentIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

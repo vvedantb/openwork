@@ -9,7 +9,18 @@
     "dev:backend": "pnpm --filter backend dev",
     "build": "pnpm --filter web build",
     "typecheck": "pnpm --filter web typecheck && pnpm --filter backend typecheck",
-    "codegen": "pnpm --filter backend codegen"
+    "codegen": "pnpm --filter backend codegen",
+    "remotion:studio": "pnpm --filter web remotion:studio",
+    "render:deck": "pnpm --filter web render:deck",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx,json,css,md}": "prettier --write"
+  },
+  "devDependencies": {
+    "husky": "^9.1.7",
+    "lint-staged": "^15.4.3",
+    "prettier": "^3.5.3"
   },
   "engines": {
     "node": ">=20"

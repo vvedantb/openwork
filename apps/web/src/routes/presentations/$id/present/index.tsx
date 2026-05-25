@@ -5,7 +5,7 @@ import { api } from "backend/convex/_generated/api";
 import { SlidePlayer } from "@/components/SlidePlayer";
 import type { PresentationId } from "@/types";
 
-export const Route = createFileRoute("/presentations/$id/present")({
+export const Route = createFileRoute("/presentations/$id/present/")({
   beforeLoad: ({ context }) => {
     if (context.auth.isLoaded && !context.auth.isSignedIn) {
       throw redirect({ to: "/" });
