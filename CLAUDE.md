@@ -13,7 +13,7 @@ Implementation:
 - Minimize surface area of change; co-locate logic where it belongs
 - Prefer explicit over magical behaviour
 
-Slide platform (primary product):
+OpenDesign (primary product):
 
 - Decks are **code-defined** in `apps/web/src/decks/` — edit slides locally in git, deploy via Vercel
 - **Registry:** `apps/web/src/decks/registry.ts` maps deck IDs to manifests (`SlideEntry[]`, speaker notes, theme)

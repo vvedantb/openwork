@@ -30,10 +30,10 @@ function RootLayout() {
   return (
     <div className="app-shell">
       <header className="app-header">
-        <Link to="/" className="brand" aria-label="Home">
+        <Link to="/" className="brand" aria-label="OpenDesign home">
           <span className="brand-mark" aria-hidden="true" />
           <span className="brand-wordmark">
-            Slides<em>.</em>
+            Open<em>Design</em>
           </span>
         </Link>
         {deck ? <span className="nav-deck-title">{deck.title}</span> : null}

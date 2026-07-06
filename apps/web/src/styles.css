@@ -3,7 +3,7 @@
 @import "./fonts/geist-pixel.css";
 
 /* =========================================================================
-   Folio — Editorial Studio aesthetic
+   OpenDesign — editorial slide platform aesthetic
    Paper + ink dual context. Geist Pixel display, Geist sans, Geist Mono.
    Vermillion accent (#C2410C).
    ========================================================================= */
@@ -1374,7 +1374,7 @@ button {
    Entrance animations
    ========================================================================= */
 
-@keyframes folio-rise {
+@keyframes opendesign-rise {
   from {
     opacity: 0;
     transform: translateY(12px);
@@ -1387,7 +1387,7 @@ button {
 
 .stagger > * {
   opacity: 0;
-  animation: folio-rise 700ms var(--ease-out) forwards;
+  animation: opendesign-rise 700ms var(--ease-out) forwards;
 }
 
 .stagger > *:nth-child(1) {

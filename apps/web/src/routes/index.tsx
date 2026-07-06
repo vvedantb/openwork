@@ -9,7 +9,7 @@ function HomePage() {
   return (
     <section className="landing">
       <div className="landing-copy stagger">
-        <p className="eyebrow">Slide platform</p>
+        <p className="eyebrow">OpenDesign</p>
         <h1 className="hero-title">
           Deployed decks,
           <br />
