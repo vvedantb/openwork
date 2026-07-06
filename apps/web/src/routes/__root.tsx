@@ -36,6 +36,23 @@ function RootLayout() {
             Open<em>Design</em>
           </span>
         </Link>
+        <nav aria-label="Site">
+          <Link
+            to="/"
+            className="nav-link"
+            activeOptions={{ exact: true }}
+            activeProps={{ className: "nav-link active" }}
+          >
+            Home
+          </Link>
+          <Link
+            to="/decks"
+            className="nav-link"
+            activeProps={{ className: "nav-link active" }}
+          >
+            Decks
+          </Link>
+        </nav>
         {deck ? <span className="nav-deck-title">{deck.title}</span> : null}
       </header>
       <Outlet />

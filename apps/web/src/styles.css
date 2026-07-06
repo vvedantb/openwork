@@ -1473,6 +1473,12 @@ button {
   max-width: 520px;
 }
 
+.deck-catalog-page {
+  margin-top: 0;
+  max-width: none;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+}
+
 .deck-card {
   display: flex;
   flex-direction: column;

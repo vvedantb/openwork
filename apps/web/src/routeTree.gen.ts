@@ -8,70 +8,88 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
-import { Route as DDeckIdRouteImport } from './routes/d.$deckId'
+import { Route as rootRouteImport } from "./routes/__root";
+import { Route as DecksRouteImport } from "./routes/decks";
+import { Route as IndexRouteImport } from "./routes/index";
+import { Route as DDeckIdRouteImport } from "./routes/d.$deckId";
 
+const DecksRoute = DecksRouteImport.update({
+  id: "/decks",
+  path: "/decks",
+  getParentRoute: () => rootRouteImport,
+} as any);
 const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+  id: "/",
+  path: "/",
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const DDeckIdRoute = DDeckIdRouteImport.update({
-  id: '/d/$deckId',
-  path: '/d/$deckId',
+  id: "/d/$deckId",
+  path: "/d/$deckId",
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '/d/$deckId': typeof DDeckIdRoute
+  "/": typeof IndexRoute;
+  "/decks": typeof DecksRoute;
+  "/d/$deckId": typeof DDeckIdRoute;
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '/d/$deckId': typeof DDeckIdRoute
+  "/": typeof IndexRoute;
+  "/decks": typeof DecksRoute;
+  "/d/$deckId": typeof DDeckIdRoute;
 }
 export interface FileRoutesById {
-  __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
-  '/d/$deckId': typeof DDeckIdRoute
+  __root__: typeof rootRouteImport;
+  "/": typeof IndexRoute;
+  "/decks": typeof DecksRoute;
+  "/d/$deckId": typeof DDeckIdRoute;
 }
 export interface FileRouteTypes {
-  fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/d/$deckId'
-  fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/d/$deckId'
-  id: '__root__' | '/' | '/d/$deckId'
-  fileRoutesById: FileRoutesById
+  fileRoutesByFullPath: FileRoutesByFullPath;
+  fullPaths: "/" | "/decks" | "/d/$deckId";
+  fileRoutesByTo: FileRoutesByTo;
+  to: "/" | "/decks" | "/d/$deckId";
+  id: "__root__" | "/" | "/decks" | "/d/$deckId";
+  fileRoutesById: FileRoutesById;
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
-  DDeckIdRoute: typeof DDeckIdRoute
+  IndexRoute: typeof IndexRoute;
+  DecksRoute: typeof DecksRoute;
+  DDeckIdRoute: typeof DDeckIdRoute;
 }
 
-declare module '@tanstack/react-router' {
+declare module "@tanstack/react-router" {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/d/$deckId': {
-      id: '/d/$deckId'
-      path: '/d/$deckId'
-      fullPath: '/d/$deckId'
-      preLoaderRoute: typeof DDeckIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
+    "/decks": {
+      id: "/decks";
+      path: "/decks";
+      fullPath: "/decks";
+      preLoaderRoute: typeof DecksRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/": {
+      id: "/";
+      path: "/";
+      fullPath: "/";
+      preLoaderRoute: typeof IndexRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/d/$deckId": {
+      id: "/d/$deckId";
+      path: "/d/$deckId";
+      fullPath: "/d/$deckId";
+      preLoaderRoute: typeof DDeckIdRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  DecksRoute: DecksRoute,
   DDeckIdRoute: DDeckIdRoute,
-}
+};
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
-  ._addFileTypes<FileRouteTypes>()
+  ._addFileTypes<FileRouteTypes>();

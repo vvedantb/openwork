@@ -1,5 +1,4 @@
 import { Link, createFileRoute } from "@tanstack/react-router";
-import { DECK_LIST, deckPath } from "@/decks/registry";
 
 export const Route = createFileRoute("/")({
   component: HomePage,
@@ -21,17 +20,10 @@ function HomePage() {
           it up on deploy.
         </p>
 
-        <div className="deck-catalog">
-          {DECK_LIST.map((deck) => (
-            <Link key={deck.id} to={deckPath(deck.id)} className="deck-card">
-              <span className="deck-card-eyebrow">{deck.id}</span>
-              <span className="deck-card-title">{deck.title}</span>
-              <span className="deck-card-desc">{deck.description}</span>
-              <span className="deck-card-meta">
-                {deck.slides.length} slides
-              </span>
-            </Link>
-          ))}
+        <div className="landing-actions">
+          <Link to="/decks" className="btn primary">
+            Browse decks
+          </Link>
         </div>
       </div>
     </section>
