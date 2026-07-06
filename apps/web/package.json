@@ -10,18 +10,29 @@
     "typecheck": "tsc -b --noEmit",
     "remotion:studio": "remotion studio",
     "remotion:render": "remotion render",
-    "render:deck": "tsx scripts/render-deck.ts"
+    "generate:vmem-changelog": "node scripts/generate-vmem-changelog.mjs",
+    "render:changelog": "tsx scripts/render-changelog.ts"
   },
   "dependencies": {
-    "@clerk/clerk-react": "^5.18.0",
-    "@remotion/player": "^4.0.230",
+    "@radix-ui/react-label": "^2.1.11",
+    "@radix-ui/react-popover": "^1.1.18",
+    "@radix-ui/react-slot": "^1.3.0",
+    "@radix-ui/react-tabs": "^1.1.16",
+    "@remotion/google-fonts": "4.0.230",
+    "@tabler/icons-react": "^3.44.0",
     "@tanstack/react-query": "^5.59.20",
     "@tanstack/react-router": "^1.85.5",
     "backend": "workspace:*",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
     "convex": "^1.17.0",
+    "motion": "^12.42.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "remotion": "^4.0.230"
+    "remotion": "^4.0.230",
+    "sonner": "^2.0.7",
+    "tailwind-merge": "^3.6.0",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@remotion/bundler": "4.0.230",
@@ -32,6 +43,10 @@
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "@vitejs/plugin-react": "^4.3.3",
+    "autoprefixer": "^10.5.2",
+    "postcss": "^8.5.16",
+    "tailwindcss": "3",
+    "tailwindcss-animate": "^1.0.7",
     "tsx": "^4.19.2",
     "typescript": "^5.6.3",
     "vite": "^5.4.10"

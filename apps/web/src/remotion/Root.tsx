@@ -2,50 +2,38 @@ import { Composition, Folder } from "remotion";
 import type { CalculateMetadataFunction } from "remotion";
 import { SLIDE_HEIGHT, SLIDE_WIDTH } from "@/types";
 import {
-  deckDurationInFrames,
-  SLIDE_DURATION_IN_FRAMES,
-  SLIDE_FPS,
-} from "./constants";
-import { DeckComposition, type DeckCompositionProps } from "./DeckComposition";
+  ChangelogComposition,
+  type ChangelogCompositionProps,
+} from "./changelog/ChangelogComposition";
 import {
-  DEFAULT_DECK_PROPS,
-  DEFAULT_SLIDE_PROPS,
-} from "./default-props";
-import {
-  SlideComposition,
-  type SlideCompositionProps,
-} from "./SlideComposition";
+  changelogDurationInFrames,
+  CHANGELOG_FPS,
+} from "./changelog/constants";
+import { DEFAULT_CHANGELOG_PROPS } from "./changelog/default-props";
 
-const deckCalculateMetadata: CalculateMetadataFunction<DeckCompositionProps> = ({
-  props,
-}) => ({
-  durationInFrames: deckDurationInFrames(props.slides.length),
+const changelogCalculateMetadata: CalculateMetadataFunction<
+  ChangelogCompositionProps
+> = ({ props }) => ({
+  durationInFrames: changelogDurationInFrames(props.slides.length),
 });
 
 export function RemotionRoot() {
   return (
-    <>
-      <Folder name="Folio">
-        <Composition
-          id="Slide"
-          component={SlideComposition}
-          durationInFrames={SLIDE_DURATION_IN_FRAMES}
-          fps={SLIDE_FPS}
-          width={SLIDE_WIDTH}
-          height={SLIDE_HEIGHT}
-          defaultProps={DEFAULT_SLIDE_PROPS satisfies SlideCompositionProps}
-        />
-        <Composition
-          id="Deck"
-          component={DeckComposition}
-          durationInFrames={deckDurationInFrames(DEFAULT_DECK_PROPS.slides.length)}
-          fps={SLIDE_FPS}
-          width={SLIDE_WIDTH}
-          height={SLIDE_HEIGHT}
-          defaultProps={DEFAULT_DECK_PROPS satisfies DeckCompositionProps}
-          calculateMetadata={deckCalculateMetadata}
-        />
-      </Folder>
-    </>
+    <Folder name="Changelogs">
+      <Composition
+        id="VmemChangelog"
+        component={ChangelogComposition}
+        durationInFrames={changelogDurationInFrames(
+          DEFAULT_CHANGELOG_PROPS.slides.length,
+        )}
+        fps={CHANGELOG_FPS}
+        width={SLIDE_WIDTH}
+        height={SLIDE_HEIGHT}
+        defaultProps={
+          DEFAULT_CHANGELOG_PROPS satisfies ChangelogCompositionProps
+        }
+        calculateMetadata={changelogCalculateMetadata}
+      />
+    </Folder>
   );
 }

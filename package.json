@@ -11,7 +11,6 @@
     "typecheck": "pnpm --filter web typecheck && pnpm --filter backend typecheck",
     "codegen": "pnpm --filter backend codegen",
     "remotion:studio": "pnpm --filter web remotion:studio",
-    "render:deck": "pnpm --filter web render:deck",
     "prepare": "husky"
   },
   "lint-staged": {

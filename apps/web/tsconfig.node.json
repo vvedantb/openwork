@@ -19,6 +19,8 @@
     "vite.config.ts",
     "vite-plugin-deck-render.ts",
     "remotion.config.ts",
-    "scripts/**/*.ts"
+    "scripts/**/*.ts",
+    "src/remotion/changelog/types.ts",
+    "src/remotion/changelog/constants.ts"
   ]
 }

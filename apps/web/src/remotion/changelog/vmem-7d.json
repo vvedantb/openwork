@@ -1,0 +1,105 @@
+{
+  "title": "vmem Weekly Changelog",
+  "repo": "vmem",
+  "dateRange": "2026-05-20 → 2026-05-25",
+  "commitCount": 138,
+  "generatedAt": "2026-05-25T15:14:19.974Z",
+  "slides": [
+    {
+      "id": "sidebar-nav",
+      "visual": "sidebar-nav",
+      "title": "Sub-sidebar navigation",
+      "subtitle": "Teams, Wiki, Skills & Codebases each get a searchable sub-sidebar with back navigation",
+      "accent": "#6366f1",
+      "commitCount": 8
+    },
+    {
+      "id": "memory-graph",
+      "visual": "memory-graph",
+      "title": "Interactive memory graph",
+      "subtitle": "Pan & zoom your memory graph inside Claude via MCP Apps — aligned with the web UI",
+      "accent": "#06b6d4",
+      "commitCount": 5
+    },
+    {
+      "id": "optimistic-ui",
+      "visual": "optimistic-ui",
+      "title": "Optimistic mutations",
+      "subtitle": "Toggles, lists & forms update instantly — Convex patches the cache before the server responds",
+      "accent": "#14b8a6",
+      "commitCount": 1
+    },
+    {
+      "id": "gmail-sync",
+      "visual": "gmail-sync",
+      "title": "Gmail connector",
+      "subtitle": "OAuth ingest pulls inbox messages into memories — daily full sync at 04:00 UTC",
+      "accent": "#10b981",
+      "commitCount": 4
+    },
+    {
+      "id": "api-keys",
+      "visual": "api-keys",
+      "title": "API key management",
+      "subtitle": "Rename active or revoked keys, delete stale rows, cleaner table actions",
+      "accent": "#f59e0b",
+      "commitCount": 6
+    },
+    {
+      "id": "http-api",
+      "visual": "http-api",
+      "title": "HTTP Memories API",
+      "subtitle": "DELETE /api/v1/memories plus live integration tests for store, retrieve, patch & delete",
+      "accent": "#eab308",
+      "commitCount": 3
+    },
+    {
+      "id": "wiki-skills",
+      "visual": "wiki-skills",
+      "title": "Wiki & Skills chrome",
+      "subtitle": "Editable titles in the page header, outline toggles in menus, add actions in the sidebar",
+      "accent": "#8b5cf6",
+      "commitCount": 4
+    },
+    {
+      "id": "inbox-proposals",
+      "visual": "inbox-proposals",
+      "title": "Inbox proposals",
+      "subtitle": "Kind-colored accent rails and clearer cards for reviewing Dream Mode synthesis proposals",
+      "accent": "#f97316",
+      "commitCount": 1
+    },
+    {
+      "id": "chrome-extension",
+      "visual": "chrome-extension",
+      "title": "Chrome extension sync",
+      "subtitle": "Restart-proof auth via cookies, lightweight service worker, reliable 30-min auto-sync",
+      "accent": "#3b82f6",
+      "commitCount": 4
+    },
+    {
+      "id": "mcp-tools",
+      "visual": "mcp-tools",
+      "title": "MCP tool expansion",
+      "subtitle": "skills_create, skills_update, wiki CRUD, memory_add_instruction & memory_related",
+      "accent": "#22d3ee",
+      "commitCount": 4
+    },
+    {
+      "id": "agent-sdk",
+      "visual": "agent-sdk",
+      "title": "@vmem/sdk",
+      "subtitle": "Agentic SDK over existing HTTP routes — npm publish workflow for programmatic memory access",
+      "accent": "#ec4899",
+      "commitCount": 2
+    },
+    {
+      "id": "list-rows",
+      "visual": "list-rows",
+      "title": "Flat list surfaces",
+      "subtitle": "Memory list, AI logs & activity rows use hover-only backgrounds — no resting muted fill",
+      "accent": "#a855f7",
+      "commitCount": 4
+    }
+  ]
+}

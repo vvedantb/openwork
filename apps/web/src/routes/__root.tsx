@@ -4,21 +4,11 @@ import {
   Link,
   useRouterState,
 } from "@tanstack/react-router";
-import {
-  SignedIn,
-  SignedOut,
-  SignInButton,
-  UserButton,
-} from "@clerk/clerk-react";
 import type { ConvexReactClient } from "convex/react";
+import { getDeck } from "@/decks/registry";
 
 export type RouterContext = {
   convex: ConvexReactClient;
-  auth: {
-    isSignedIn: boolean;
-    isLoaded: boolean;
-    userId: string | null;
-  };
 };
 
 export const Route = createRootRouteWithContext<RouterContext>()({
@@ -27,54 +17,26 @@ export const Route = createRootRouteWithContext<RouterContext>()({
 
 function RootLayout() {
   const { location } = useRouterState();
-  const isPresent = location.pathname.endsWith("/present");
+  const deckMatch = location.pathname.match(/^\/d\/([^/]+)/);
+  const deckId = deckMatch?.[1];
+  const deck = deckId ? getDeck(deckId) : undefined;
+  const isPresenter = location.searchStr.includes("view=presenter");
+  const isDeckStage = Boolean(deckId) && !isPresenter;
 
-  if (isPresent) {
+  if (isDeckStage || isPresenter) {
     return <Outlet />;
   }
-
-  const isDecks = location.pathname.startsWith("/presentations");
 
   return (
     <div className="app-shell">
       <header className="app-header">
-        <Link to="/" className="brand" aria-label="Folio home">
+        <Link to="/" className="brand" aria-label="Home">
           <span className="brand-mark" aria-hidden="true" />
           <span className="brand-wordmark">
-            Folio<em>.</em>
+            Slides<em>.</em>
           </span>
         </Link>
-        <nav aria-label="Primary">
-          <SignedIn>
-            <Link
-              to="/presentations"
-              className={`nav-link ${isDecks ? "active" : ""}`}
-            >
-              Decks
-            </Link>
-            <a
-              className="nav-link"
-              href="https://www.remotion.dev/docs"
-              target="_blank"
-              rel="noreferrer"
-            >
-              Docs
-            </a>
-          </SignedIn>
-        </nav>
-        <div className="header-actions">
-          <SignedIn>
-            <Link to="/presentations" className="btn ghost">
-              My decks
-            </Link>
-            <UserButton afterSignOutUrl="/" />
-          </SignedIn>
-          <SignedOut>
-            <SignInButton mode="modal">
-              <button className="btn primary">Sign in</button>
-            </SignInButton>
-          </SignedOut>
-        </div>
+        {deck ? <span className="nav-deck-title">{deck.title}</span> : null}
       </header>
       <Outlet />
     </div>

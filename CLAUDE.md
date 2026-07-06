@@ -13,22 +13,34 @@ Implementation:
 - Minimize surface area of change; co-locate logic where it belongs
 - Prefer explicit over magical behaviour
 
-Convex:
+Slide platform (primary product):
 
+- Decks are **code-defined** in `apps/web/src/decks/` — edit slides locally in git, deploy via Vercel
+- **Registry:** `apps/web/src/decks/registry.ts` maps deck IDs to manifests (`SlideEntry[]`, speaker notes, theme)
+- **Presenter:** `/d/$deckId` — fullscreen web presenter with keyboard nav, step-gated builds, optional live sync
+- **Catalog:** `/` lists registered decks
+- **Shared shell:** `apps/web/src/decks/platform/` — `SlideDeck`, `SlideShell`, `PresenterView`, sync hooks
+- **Themes:** `apps/web/src/decks/themes/` — motion tokens and UI variables (Tailwind on deck routes)
+- Adding a deck: new folder under `decks/` + one entry in `registry.ts`
+- No in-browser editor; no Clerk auth on deck routes (public presenter)
+
+Convex (live sync only):
+
+- Tables: `presentationSessions`, `presentationVotes` — follow-the-presenter via share code
+- API: `packages/backend/convex/presentations.ts`
+- Plain `ConvexProvider` in `main.tsx` (no Clerk)
 - Never manually define interfaces for Convex documents
 - Always import `Doc<"tableName">`, `Id<"tableName">`, and `FunctionReturnType<typeof api.fn>`
-- Convex types are the single source of truth
 - To typecheck Convex: `cd packages/backend && npx convex codegen --typecheck enable`
 - Never run `npx convex dev` or `npx convex deploy` unless the user asks
 - When the user says `pnpm dev:backend`, that means the Convex dev server
 
-Remotion:
+Remotion (changelog video pipeline only):
 
-- Preview uses `@remotion/player`; full export uses `@remotion/cli` + `Deck` composition
-- Keep slide timing in `apps/web/src/remotion/constants.ts`
-- Dev export: **Export MP4** in the editor (POST `/api/render-deck`)
-- CLI export: `pnpm render:deck --props=./deck-props.json --output=./out/deck.mp4`
-- Studio: `pnpm remotion:studio`
+- **Not** the main web presenter — decks use Motion + React in the browser
+- Studio: `pnpm remotion:studio` — preview `VmemChangelog` composition
+- CLI export: changelog scripts in `apps/web/scripts/` (see `package.json`)
+- Keep slide timing in `apps/web/src/remotion/changelog/constants.ts`
 
 TanStack Router (apps/web):
 
@@ -57,6 +69,11 @@ Verification after implementation:
 - Run typecheck in the packages you touched when the user asks or when shipping
 - Run `/changelog` after medium-to-large user-facing changes
 - Update AGENTS.md / CLAUDE.md if architecture decisions changed
+
+vmem pitch deck gotchas (when editing slides):
+
+- `initial={false}` on looping keyframe animations breaks prod builds
+- `ring-foreground/<alpha>` and `outline-foreground/<alpha>` are unreliable with oklch tokens — use inline opacity
 
 Philosophy:
 

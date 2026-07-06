@@ -1,0 +1,145 @@
+import { createFileRoute, useNavigate, redirect } from "@tanstack/react-router";
+import { z } from "zod";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { SlideDeck } from "@/decks/platform/SlideDeck";
+import { usePresentationSync } from "@/decks/platform/usePresentationSync";
+import { PresentationControls } from "@/decks/platform/PresentationControls";
+import { PresentationDeckProvider } from "@/decks/platform/PresentationDeckContext";
+import { PresenterView } from "@/decks/platform/PresenterView";
+import {
+  openPresenterWindow,
+  subscribePresenterChannel,
+} from "@/decks/platform/presenterWindowSync";
+import { deckPath, getDeck } from "@/decks/registry";
+import "@/decks/deck-globals.css";
+
+const searchSchema = z.object({
+  slide: z.number().int().min(1).optional().default(1),
+  session: z.coerce.string().optional(),
+  view: z.enum(["presenter"]).optional(),
+});
+
+export const Route = createFileRoute("/d/$deckId")({
+  validateSearch: searchSchema,
+  beforeLoad: ({ params }) => {
+    if (!getDeck(params.deckId)) {
+      throw redirect({ to: "/" });
+    }
+  },
+  component: DeckPresenterPage,
+});
+
+function DeckPresenterPage() {
+  const { deckId } = Route.useParams();
+  const deck = getDeck(deckId);
+  const { slide, session, view } = Route.useSearch();
+  const path = deckPath(deckId);
+  const navigate = useNavigate({ from: "/d/$deckId" });
+
+  const updateSearch = useCallback(
+    (next: { slide?: number; session?: string }) => {
+      void navigate({
+        search: (prev) => ({ ...prev, ...next }),
+        replace: true,
+      });
+    },
+    [navigate],
+  );
+
+  if (!deck) {
+    return null;
+  }
+
+  if (view === "presenter") {
+    return (
+      <PresenterView
+        deck={deck}
+        deckPath={path}
+        slide={slide}
+        session={session}
+        updateSearch={updateSearch}
+      />
+    );
+  }
+
+  return (
+    <StageView
+      deck={deck}
+      deckPath={path}
+      slide={slide}
+      session={session}
+      updateSearch={updateSearch}
+    />
+  );
+}
+
+interface StageViewProps {
+  deck: NonNullable<ReturnType<typeof getDeck>>;
+  deckPath: string;
+  slide: number;
+  session: string | undefined;
+  updateSearch: (next: { slide?: number; session?: string }) => void;
+}
+
+function StageView({
+  deck,
+  deckPath: path,
+  slide,
+  session,
+  updateSearch,
+}: StageViewProps) {
+  const [presenterDetached, setPresenterDetached] = useState(false);
+
+  useEffect(() => {
+    return subscribePresenterChannel({
+      onSlide: (nextSlide) => updateSearch({ slide: nextSlide }),
+      onPresenterOpen: () => setPresenterDetached(true),
+      onPresenterClosed: () => setPresenterDetached(false),
+    });
+  }, [updateSearch]);
+
+  const sync = usePresentationSync({
+    slide,
+    sessionCode: session,
+    updateSearch,
+    deckPath: path,
+  });
+
+  const deckContext = useMemo(
+    () => ({
+      sessionCode: session,
+      participantKey: sync.participantKey,
+      hostKey: sync.hostKey,
+    }),
+    [session, sync.participantKey, sync.hostKey],
+  );
+
+  const isFollower =
+    session !== undefined &&
+    sync.sessionState !== "none" &&
+    sync.sessionState !== "notfound" &&
+    !sync.isHost;
+  const canDrive = !isFollower;
+  const canOpenPresenter = session === undefined || sync.isHost;
+  const stageNavigation = canDrive && !presenterDetached;
+
+  return (
+    <>
+      <PresentationDeckProvider value={deckContext}>
+        <SlideDeck
+          slides={deck.slides}
+          slide={sync.effectiveSlide}
+          onNavigate={sync.onNavigate}
+          allowNavigation={stageNavigation}
+          showOutline={!presenterDetached}
+        />
+      </PresentationDeckProvider>
+      <PresentationControls
+        sync={sync}
+        canOpenPresenter={canOpenPresenter}
+        presenterDetached={presenterDetached}
+        onOpenPresenter={openPresenterWindow}
+      />
+    </>
+  );
+}

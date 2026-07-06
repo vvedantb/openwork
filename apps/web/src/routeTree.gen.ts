@@ -8,120 +8,70 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
-import { Route as PresentationsIndexRouteImport } from './routes/presentations/index'
-import { Route as PresentationsIdIndexRouteImport } from './routes/presentations/$id/index'
-import { Route as PresentationsIdPresentIndexRouteImport } from './routes/presentations/$id/present/index'
+import { Route as rootRouteImport } from "./routes/__root";
+import { Route as IndexRouteImport } from "./routes/index";
+import { Route as DDeckIdRouteImport } from "./routes/d.$deckId";
 
 const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+  id: "/",
+  path: "/",
   getParentRoute: () => rootRouteImport,
-} as any)
-const PresentationsIndexRoute = PresentationsIndexRouteImport.update({
-  id: '/presentations/',
-  path: '/presentations/',
+} as any);
+const DDeckIdRoute = DDeckIdRouteImport.update({
+  id: "/d/$deckId",
+  path: "/d/$deckId",
   getParentRoute: () => rootRouteImport,
-} as any)
-const PresentationsIdIndexRoute = PresentationsIdIndexRouteImport.update({
-  id: '/presentations/$id/',
-  path: '/presentations/$id/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PresentationsIdPresentIndexRoute =
-  PresentationsIdPresentIndexRouteImport.update({
-    id: '/presentations/$id/present/',
-    path: '/presentations/$id/present/',
-    getParentRoute: () => rootRouteImport,
-  } as any)
+} as any);
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '/presentations/': typeof PresentationsIndexRoute
-  '/presentations/$id/': typeof PresentationsIdIndexRoute
-  '/presentations/$id/present/': typeof PresentationsIdPresentIndexRoute
+  "/": typeof IndexRoute;
+  "/d/$deckId": typeof DDeckIdRoute;
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '/presentations': typeof PresentationsIndexRoute
-  '/presentations/$id': typeof PresentationsIdIndexRoute
-  '/presentations/$id/present': typeof PresentationsIdPresentIndexRoute
+  "/": typeof IndexRoute;
+  "/d/$deckId": typeof DDeckIdRoute;
 }
 export interface FileRoutesById {
-  __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
-  '/presentations/': typeof PresentationsIndexRoute
-  '/presentations/$id/': typeof PresentationsIdIndexRoute
-  '/presentations/$id/present/': typeof PresentationsIdPresentIndexRoute
+  __root__: typeof rootRouteImport;
+  "/": typeof IndexRoute;
+  "/d/$deckId": typeof DDeckIdRoute;
 }
 export interface FileRouteTypes {
-  fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths:
-    | '/'
-    | '/presentations/'
-    | '/presentations/$id/'
-    | '/presentations/$id/present/'
-  fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/'
-    | '/presentations'
-    | '/presentations/$id'
-    | '/presentations/$id/present'
-  id:
-    | '__root__'
-    | '/'
-    | '/presentations/'
-    | '/presentations/$id/'
-    | '/presentations/$id/present/'
-  fileRoutesById: FileRoutesById
+  fileRoutesByFullPath: FileRoutesByFullPath;
+  fullPaths: "/" | "/d/$deckId";
+  fileRoutesByTo: FileRoutesByTo;
+  to: "/" | "/d/$deckId";
+  id: "__root__" | "/" | "/d/$deckId";
+  fileRoutesById: FileRoutesById;
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
-  PresentationsIndexRoute: typeof PresentationsIndexRoute
-  PresentationsIdIndexRoute: typeof PresentationsIdIndexRoute
-  PresentationsIdPresentIndexRoute: typeof PresentationsIdPresentIndexRoute
+  IndexRoute: typeof IndexRoute;
+  DDeckIdRoute: typeof DDeckIdRoute;
 }
 
-declare module '@tanstack/react-router' {
+declare module "@tanstack/react-router" {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/presentations/': {
-      id: '/presentations/'
-      path: '/presentations'
-      fullPath: '/presentations/'
-      preLoaderRoute: typeof PresentationsIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/presentations/$id/': {
-      id: '/presentations/$id/'
-      path: '/presentations/$id'
-      fullPath: '/presentations/$id/'
-      preLoaderRoute: typeof PresentationsIdIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/presentations/$id/present/': {
-      id: '/presentations/$id/present/'
-      path: '/presentations/$id/present'
-      fullPath: '/presentations/$id/present/'
-      preLoaderRoute: typeof PresentationsIdPresentIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
+    "/": {
+      id: "/";
+      path: "/";
+      fullPath: "/";
+      preLoaderRoute: typeof IndexRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/d/$deckId": {
+      id: "/d/$deckId";
+      path: "/d/$deckId";
+      fullPath: "/d/$deckId";
+      preLoaderRoute: typeof DDeckIdRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  PresentationsIndexRoute: PresentationsIndexRoute,
-  PresentationsIdIndexRoute: PresentationsIdIndexRoute,
-  PresentationsIdPresentIndexRoute: PresentationsIdPresentIndexRoute,
-}
+  DDeckIdRoute: DDeckIdRoute,
+};
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
-  ._addFileTypes<FileRouteTypes>()
+  ._addFileTypes<FileRouteTypes>();
