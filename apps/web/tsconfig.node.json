@@ -10,14 +10,12 @@
     "noEmit": true,
     "composite": true,
     "types": ["node"],
-    "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
     }
   },
   "include": [
     "vite.config.ts",
-    "vite-plugin-deck-render.ts",
     "remotion.config.ts",
     "scripts/**/*.ts",
     "src/remotion/changelog/types.ts",

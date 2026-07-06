@@ -1,5 +1,5 @@
 import { motion } from "motion/react";
-import "@/routes/_components/landing/landing.css";
+import "./landing.css";
 
 /**
  * Full-bleed ambient graph for slides — adapted from LandingAmbientGraph but

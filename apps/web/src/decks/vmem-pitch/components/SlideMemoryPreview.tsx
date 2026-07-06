@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { motion, useMotionValue, useTransform, animate } from "motion/react";
 import { cn } from "@/decks/platform/ui";
-import "@/routes/_components/landing/landing.css";
+import "./landing.css";
 import {
   edgeTouchesNode,
   previewEdges,
