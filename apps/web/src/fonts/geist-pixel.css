@@ -1,0 +1,7 @@
+@font-face {
+  font-family: "Geist Pixel Square";
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("/fonts/GeistPixel-Square.woff2") format("woff2");
+}

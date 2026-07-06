@@ -1,6 +1,10 @@
+@import "@fontsource-variable/geist";
+@import "@fontsource-variable/geist-mono";
+@import "./fonts/geist-pixel.css";
+
 /* =========================================================================
    Folio — Editorial Studio aesthetic
-   Paper + ink dual context. Fraunces display, Manrope sans, JetBrains mono.
+   Paper + ink dual context. Geist Pixel display, Geist sans, Geist Mono.
    Vermillion accent (#C2410C).
    ========================================================================= */
 
@@ -35,11 +39,10 @@
   --success: #166534;
 
   /* Type families */
-  --font-display:
-    "Fraunces", "Iowan Old Style", "Apple Garamond", Georgia, serif;
+  --font-display: "Geist Pixel Square", "Geist Variable", system-ui, sans-serif;
   --font-sans:
-    "Manrope", "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --font-mono: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace;
+    "Geist Variable", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "Geist Mono Variable", "SF Mono", Menlo, Consolas, monospace;
 
   /* Motion */
   --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
@@ -79,7 +82,6 @@ body {
     );
   color: var(--type-paper);
   font-family: var(--font-sans);
-  font-feature-settings: "ss01", "cv11";
   font-size: 15px;
   line-height: 1.55;
   -webkit-font-smoothing: antialiased;

@@ -120,7 +120,7 @@
   }
 }
 
-/* Unlayered so this wins over catalog styles.css body { font-family: Manrope } */
+/* Unlayered so this wins over catalog styles.css body font on deck routes */
 body:has(.deck-ui) {
   font-family: "Instrument Sans", system-ui, sans-serif;
   font-feature-settings: normal;
