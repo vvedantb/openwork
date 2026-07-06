@@ -207,7 +207,7 @@ export function SlideDeck({
   return (
     <div
       ref={containerRef}
-      className="fixed inset-0 flex overflow-hidden bg-background"
+      className="fixed inset-0 flex overflow-hidden bg-background font-sans antialiased"
     >
       <SlideOutlinePanel
         slides={slides}

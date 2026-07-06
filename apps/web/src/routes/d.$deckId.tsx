@@ -52,24 +52,28 @@ function DeckPresenterPage() {
 
   if (view === "presenter") {
     return (
-      <PresenterView
+      <div className="deck-ui">
+        <PresenterView
+          deck={deck}
+          deckPath={path}
+          slide={slide}
+          session={session}
+          updateSearch={updateSearch}
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div className="deck-ui">
+      <StageView
         deck={deck}
         deckPath={path}
         slide={slide}
         session={session}
         updateSearch={updateSearch}
       />
-    );
-  }
-
-  return (
-    <StageView
-      deck={deck}
-      deckPath={path}
-      slide={slide}
-      session={session}
-      updateSearch={updateSearch}
-    />
+    </div>
   );
 }
 
