@@ -77,7 +77,7 @@ export function ToolLogo({ tool, className = "" }: ToolLogoProps) {
     case "copilot":
       return (
         <img
-          src="/model-providers/microsoft.svg"
+          src="/media/slides/intro-to-vmem/logo-microsoft.svg"
           alt=""
           aria-hidden
           className={className}

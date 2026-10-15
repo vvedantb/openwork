@@ -132,7 +132,7 @@ function ToolUseBlock({ p }: { p: Palette }) {
     >
       <div className="flex items-center gap-2">
         <img
-          src="/icon.png"
+          src="/media/slides/intro-to-vmem/icon.png"
           alt="vmem"
           className="h-4 w-4 rounded"
           draggable={false}

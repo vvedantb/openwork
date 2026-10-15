@@ -58,7 +58,7 @@ function VmemLockupIcon({ size }: { size: number }) {
       style={{ width: size, height: size }}
     >
       <img
-        src="/icon.png"
+        src="/media/slides/intro-to-vmem/icon.png"
         alt=""
         width={zoomed}
         height={zoomed}

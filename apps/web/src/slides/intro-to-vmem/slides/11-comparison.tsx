@@ -175,7 +175,7 @@ export function Slide11Comparison() {
             emphasised
             logo={
               <img
-                src="/icon.png"
+                src="/media/slides/intro-to-vmem/icon.png"
                 alt="vmem"
                 className="h-7 w-7 rounded-lg"
                 draggable={false}
