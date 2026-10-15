@@ -11,6 +11,12 @@
 import { Route as rootRouteImport } from "./routes/__root";
 import { Route as DecksRouteImport } from "./routes/decks";
 import { Route as IndexRouteImport } from "./routes/index";
+import { Route as SlidesIndexRouteImport } from "./routes/slides.index";
+import { Route as ReportsIndexRouteImport } from "./routes/reports.index";
+import { Route as PostersIndexRouteImport } from "./routes/posters.index";
+import { Route as SlidesDeckIdRouteImport } from "./routes/slides.$deckId";
+import { Route as ReportsReportIdRouteImport } from "./routes/reports.$reportId";
+import { Route as PostersPosterIdRouteImport } from "./routes/posters.$posterId";
 import { Route as DDeckIdRouteImport } from "./routes/d.$deckId";
 
 const DecksRoute = DecksRouteImport.update({
@@ -23,6 +29,36 @@ const IndexRoute = IndexRouteImport.update({
   path: "/",
   getParentRoute: () => rootRouteImport,
 } as any);
+const SlidesIndexRoute = SlidesIndexRouteImport.update({
+  id: "/slides/",
+  path: "/slides/",
+  getParentRoute: () => rootRouteImport,
+} as any);
+const ReportsIndexRoute = ReportsIndexRouteImport.update({
+  id: "/reports/",
+  path: "/reports/",
+  getParentRoute: () => rootRouteImport,
+} as any);
+const PostersIndexRoute = PostersIndexRouteImport.update({
+  id: "/posters/",
+  path: "/posters/",
+  getParentRoute: () => rootRouteImport,
+} as any);
+const SlidesDeckIdRoute = SlidesDeckIdRouteImport.update({
+  id: "/slides/$deckId",
+  path: "/slides/$deckId",
+  getParentRoute: () => rootRouteImport,
+} as any);
+const ReportsReportIdRoute = ReportsReportIdRouteImport.update({
+  id: "/reports/$reportId",
+  path: "/reports/$reportId",
+  getParentRoute: () => rootRouteImport,
+} as any);
+const PostersPosterIdRoute = PostersPosterIdRouteImport.update({
+  id: "/posters/$posterId",
+  path: "/posters/$posterId",
+  getParentRoute: () => rootRouteImport,
+} as any);
 const DDeckIdRoute = DDeckIdRouteImport.update({
   id: "/d/$deckId",
   path: "/d/$deckId",
@@ -33,30 +69,82 @@ export interface FileRoutesByFullPath {
   "/": typeof IndexRoute;
   "/decks": typeof DecksRoute;
   "/d/$deckId": typeof DDeckIdRoute;
+  "/posters/$posterId": typeof PostersPosterIdRoute;
+  "/reports/$reportId": typeof ReportsReportIdRoute;
+  "/slides/$deckId": typeof SlidesDeckIdRoute;
+  "/posters/": typeof PostersIndexRoute;
+  "/reports/": typeof ReportsIndexRoute;
+  "/slides/": typeof SlidesIndexRoute;
 }
 export interface FileRoutesByTo {
   "/": typeof IndexRoute;
   "/decks": typeof DecksRoute;
   "/d/$deckId": typeof DDeckIdRoute;
+  "/posters/$posterId": typeof PostersPosterIdRoute;
+  "/reports/$reportId": typeof ReportsReportIdRoute;
+  "/slides/$deckId": typeof SlidesDeckIdRoute;
+  "/posters": typeof PostersIndexRoute;
+  "/reports": typeof ReportsIndexRoute;
+  "/slides": typeof SlidesIndexRoute;
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport;
   "/": typeof IndexRoute;
   "/decks": typeof DecksRoute;
   "/d/$deckId": typeof DDeckIdRoute;
+  "/posters/$posterId": typeof PostersPosterIdRoute;
+  "/reports/$reportId": typeof ReportsReportIdRoute;
+  "/slides/$deckId": typeof SlidesDeckIdRoute;
+  "/posters/": typeof PostersIndexRoute;
+  "/reports/": typeof ReportsIndexRoute;
+  "/slides/": typeof SlidesIndexRoute;
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath;
-  fullPaths: "/" | "/decks" | "/d/$deckId";
+  fullPaths:
+    | "/"
+    | "/decks"
+    | "/d/$deckId"
+    | "/posters/$posterId"
+    | "/reports/$reportId"
+    | "/slides/$deckId"
+    | "/posters/"
+    | "/reports/"
+    | "/slides/";
   fileRoutesByTo: FileRoutesByTo;
-  to: "/" | "/decks" | "/d/$deckId";
-  id: "__root__" | "/" | "/decks" | "/d/$deckId";
+  to:
+    | "/"
+    | "/decks"
+    | "/d/$deckId"
+    | "/posters/$posterId"
+    | "/reports/$reportId"
+    | "/slides/$deckId"
+    | "/posters"
+    | "/reports"
+    | "/slides";
+  id:
+    | "__root__"
+    | "/"
+    | "/decks"
+    | "/d/$deckId"
+    | "/posters/$posterId"
+    | "/reports/$reportId"
+    | "/slides/$deckId"
+    | "/posters/"
+    | "/reports/"
+    | "/slides/";
   fileRoutesById: FileRoutesById;
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute;
   DecksRoute: typeof DecksRoute;
   DDeckIdRoute: typeof DDeckIdRoute;
+  PostersPosterIdRoute: typeof PostersPosterIdRoute;
+  ReportsReportIdRoute: typeof ReportsReportIdRoute;
+  SlidesDeckIdRoute: typeof SlidesDeckIdRoute;
+  PostersIndexRoute: typeof PostersIndexRoute;
+  ReportsIndexRoute: typeof ReportsIndexRoute;
+  SlidesIndexRoute: typeof SlidesIndexRoute;
 }
 
 declare module "@tanstack/react-router" {
@@ -75,6 +163,48 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof IndexRouteImport;
       parentRoute: typeof rootRouteImport;
     };
+    "/slides/": {
+      id: "/slides/";
+      path: "/slides";
+      fullPath: "/slides/";
+      preLoaderRoute: typeof SlidesIndexRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/reports/": {
+      id: "/reports/";
+      path: "/reports";
+      fullPath: "/reports/";
+      preLoaderRoute: typeof ReportsIndexRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/posters/": {
+      id: "/posters/";
+      path: "/posters";
+      fullPath: "/posters/";
+      preLoaderRoute: typeof PostersIndexRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/slides/$deckId": {
+      id: "/slides/$deckId";
+      path: "/slides/$deckId";
+      fullPath: "/slides/$deckId";
+      preLoaderRoute: typeof SlidesDeckIdRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/reports/$reportId": {
+      id: "/reports/$reportId";
+      path: "/reports/$reportId";
+      fullPath: "/reports/$reportId";
+      preLoaderRoute: typeof ReportsReportIdRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/posters/$posterId": {
+      id: "/posters/$posterId";
+      path: "/posters/$posterId";
+      fullPath: "/posters/$posterId";
+      preLoaderRoute: typeof PostersPosterIdRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
     "/d/$deckId": {
       id: "/d/$deckId";
       path: "/d/$deckId";
@@ -89,6 +219,12 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DecksRoute: DecksRoute,
   DDeckIdRoute: DDeckIdRoute,
+  PostersPosterIdRoute: PostersPosterIdRoute,
+  ReportsReportIdRoute: ReportsReportIdRoute,
+  SlidesDeckIdRoute: SlidesDeckIdRoute,
+  PostersIndexRoute: PostersIndexRoute,
+  ReportsIndexRoute: ReportsIndexRoute,
+  SlidesIndexRoute: SlidesIndexRoute,
 };
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -21,8 +21,8 @@ function HomePage() {
         </p>
 
         <div className="landing-actions">
-          <Link to="/decks" className="btn primary">
-            Browse decks
+          <Link to="/slides" className="btn primary">
+            Browse slides
           </Link>
         </div>
       </div>

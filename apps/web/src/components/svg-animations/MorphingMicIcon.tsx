@@ -4,7 +4,7 @@
 "use client";
 
 import { motion } from "motion/react";
-import { cn } from "@/decks/platform/ui";
+import { cn } from "@/slides/platform/ui";
 
 interface MorphingMicIconProps {
   isListening: boolean;
