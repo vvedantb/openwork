@@ -1,6 +1,6 @@
 "use client";
 
-import { cn } from "@/decks/platform/ui";
+import { cn } from "@/slides/platform/ui";
 import { VmemDrawInIcon } from "@/components/svg-animations";
 
 const brandTextClassName =

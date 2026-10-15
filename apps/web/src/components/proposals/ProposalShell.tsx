@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Card, CardContent, cn } from "@/decks/platform/ui";
+import { Card, CardContent, cn } from "@/slides/platform/ui";
 import { formatProposalRelativeDate } from "./_proposalUtils";
 
 export function ProposalFieldLabel({ children }: { children: ReactNode }) {

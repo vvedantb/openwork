@@ -1,4 +1,4 @@
-import { cn } from "@/decks/platform/ui";
+import { cn } from "@/slides/platform/ui";
 import { VmemPaths } from "./VmemPaths";
 
 interface VmemThinkingLoaderProps {

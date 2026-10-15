@@ -5,11 +5,18 @@ import {
   useRouterState,
 } from "@tanstack/react-router";
 import type { ConvexReactClient } from "convex/react";
-import { getDeck } from "@/decks/registry";
+import { getDeck } from "@/slides/registry";
 
 export type RouterContext = {
   convex: ConvexReactClient;
 };
+
+const NAV_LINKS: { to: "/slides" | "/reports" | "/posters"; label: string }[] =
+  [
+    { to: "/slides", label: "Slides" },
+    { to: "/reports", label: "Reports" },
+    { to: "/posters", label: "Posters" },
+  ];
 
 export const Route = createRootRouteWithContext<RouterContext>()({
   component: RootLayout,
@@ -17,11 +24,12 @@ export const Route = createRootRouteWithContext<RouterContext>()({
 
 function RootLayout() {
   const { location } = useRouterState();
-  const deckMatch = location.pathname.match(/^\/d\/([^/]+)/);
+  const deckMatch = location.pathname.match(/^\/slides\/([^/]+)/);
   const deckId = deckMatch?.[1];
   const deck = deckId ? getDeck(deckId) : undefined;
   const isPresenter = location.searchStr.includes("view=presenter");
-  const isDeckStage = Boolean(deckId) && !isPresenter;
+  // Unknown ids keep the header so the not-found state has navigation.
+  const isDeckStage = Boolean(deck) && !isPresenter;
 
   if (isDeckStage || isPresenter) {
     return <Outlet />;
@@ -45,13 +53,16 @@ function RootLayout() {
           >
             Home
           </Link>
-          <Link
-            to="/decks"
-            className="nav-link"
-            activeProps={{ className: "nav-link active" }}
-          >
-            Decks
-          </Link>
+          {NAV_LINKS.map((link) => (
+            <Link
+              key={link.to}
+              to={link.to}
+              className="nav-link"
+              activeProps={{ className: "nav-link active" }}
+            >
+              {link.label}
+            </Link>
+          ))}
         </nav>
         {deck ? <span className="nav-deck-title">{deck.title}</span> : null}
       </header>

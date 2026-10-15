@@ -1,5 +1,14 @@
 # Changelog
 
+## Slides, reports and posters routes - 2026-10-15
+
+- Moved the deck presenter from `/d/$deckId` to `/slides/$deckId` and the catalog from `/decks` to `/slides`
+- Added `/reports`, `/reports/$reportId`, `/posters` and `/posters/$posterId`, each reading its own registry, with empty and not-found states
+- Renamed the `vmem-pitch` deck to `intro-to-vmem` (title "Intro to vmem"); old id still resolves
+- Moved deck assets to `/media/slides/intro-to-vmem/`, outside SPA routes and excluded from rewrites
+- Added Vercel redirects (`/d/:id`, `/d/vmem-pitch`, `/decks`) plus client redirect routes as a fallback
+- Renamed `apps/web/src/decks/` to `apps/web/src/slides/`; unknown deck ids now show a not-found state instead of redirecting home
+
 ## OpenWork rename - 2026-10-15
 
 - Renamed the product from OpenDesign to OpenWork across package name, page title, header wordmark, landing copy and agent docs

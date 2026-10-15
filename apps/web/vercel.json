@@ -1,4 +1,15 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
+  "redirects": [
+    {
+      "source": "/d/vmem-pitch",
+      "destination": "/slides/intro-to-vmem",
+      "permanent": false
+    },
+    { "source": "/d/:id", "destination": "/slides/:id", "permanent": false },
+    { "source": "/decks", "destination": "/slides", "permanent": false }
+  ],
+  "rewrites": [
+    { "source": "/((?!media/|assets/|fonts/).*)", "destination": "/index.html" }
+  ]
 }

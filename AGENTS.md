@@ -15,13 +15,16 @@ Implementation:
 
 OpenWork (primary product):
 
-- Decks are **code-defined** in `apps/web/src/decks/` — edit slides locally in git, deploy via Vercel
-- **Registry:** `apps/web/src/decks/registry.ts` maps deck IDs to manifests (`SlideEntry[]`, speaker notes, theme)
-- **Presenter:** `/d/$deckId` — fullscreen web presenter with keyboard nav, step-gated builds, optional live sync
-- **Catalog:** `/decks` lists registered decks (`/` is the landing page)
-- **Shared shell:** `apps/web/src/decks/platform/` — `SlideDeck`, `SlideShell`, `PresenterView`, sync hooks
-- **Themes:** `apps/web/src/decks/themes/` — motion tokens and UI variables (Tailwind on deck routes)
-- Adding a deck: new folder under `decks/` + one entry in `registry.ts`
+- Decks are **code-defined** in `apps/web/src/slides/` — edit slides locally in git, deploy via Vercel
+- **Registry:** `apps/web/src/slides/registry.ts` maps deck IDs to manifests (`SlideEntry[]`, speaker notes, theme)
+- **Presenter:** `/slides/$deckId` — fullscreen web presenter with keyboard nav, step-gated builds, optional live sync
+- **Catalog:** `/slides` lists registered decks (`/` is the landing page)
+- **Reports / posters:** `/reports`, `/posters` (+ `/$id`) read `apps/web/src/{reports,posters}/registry.ts`; shared catalog UI in `apps/web/src/catalog/`
+- **Shared shell:** `apps/web/src/slides/platform/` — `SlideDeck`, `SlideShell`, `PresenterView`, sync hooks
+- **Themes:** `apps/web/src/slides/themes/` — motion tokens and UI variables (Tailwind on deck routes)
+- **Static assets:** `apps/web/public/media/<kind>/<id>/` (served at `/media/...`, excluded from SPA rewrites) — never under `/slides/`
+- **Legacy URLs:** `/d/:id` and `/decks` redirect via `apps/web/vercel.json` plus client routes; old deck ids map in `LEGACY_DECK_IDS`
+- Adding a deck: new folder under `slides/` + one entry in `registry.ts`
 - No in-browser editor; no Clerk auth on deck routes (public presenter)
 
 Convex (live sync only):

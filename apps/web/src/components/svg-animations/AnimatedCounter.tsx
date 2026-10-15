@@ -6,7 +6,7 @@
 
 import { motion, useSpring, useTransform, useInView } from "motion/react";
 import { useEffect, useRef } from "react";
-import { cn } from "@/decks/platform/ui";
+import { cn } from "@/slides/platform/ui";
 
 interface AnimatedCounterProps {
   /** Target value to count up to */
