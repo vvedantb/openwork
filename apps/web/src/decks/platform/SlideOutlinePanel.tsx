@@ -3,7 +3,7 @@ import {
   IconLayoutSidebarLeftCollapse,
   IconLayoutSidebarLeftExpandFilled,
 } from "@tabler/icons-react";
-import { cn } from "@/decks/platform/ui";
+import { Button, cn } from "@/decks/platform/ui";
 import type { SlideEntry } from "@/decks/types";
 
 interface SlideOutlinePanelProps {
@@ -36,14 +36,16 @@ export function SlideOutlinePanel({
   if (!open) {
     return (
       <div className="flex w-11 shrink-0 flex-col items-center bg-background py-3">
-        <button
+        <Button
           type="button"
+          variant="ghost"
+          size="icon-sm"
           onClick={() => setOpen(true)}
-          className="flex h-9 w-9 items-center justify-center rounded-lg text-muted transition-[background-color] hover:bg-surface-tertiary/50 hover:text-foreground"
+          className="text-muted hover:bg-surface-tertiary/50 hover:text-foreground"
           aria-label="Show slide list"
         >
           <IconLayoutSidebarLeftExpandFilled size={18} stroke={1.5} />
-        </button>
+        </Button>
       </div>
     );
   }
@@ -54,14 +56,16 @@ export function SlideOutlinePanel({
         <p className="text-xs font-medium uppercase tracking-[0.16em] text-muted">
           Slides
         </p>
-        <button
+        <Button
           type="button"
+          variant="ghost"
+          size="icon-sm"
           onClick={() => setOpen(false)}
-          className="flex h-8 w-8 items-center justify-center rounded-lg text-muted transition-[background-color] hover:bg-surface-tertiary/50 hover:text-foreground"
+          className="text-muted hover:bg-surface-tertiary/50 hover:text-foreground"
           aria-label="Hide slide list"
         >
           <IconLayoutSidebarLeftCollapse size={17} stroke={1.5} />
-        </button>
+        </Button>
       </div>
 
       <nav
@@ -75,14 +79,15 @@ export function SlideOutlinePanel({
 
             return (
               <li key={entry.id}>
-                <button
+                <Button
                   ref={isActive ? activeRef : undefined}
                   type="button"
+                  variant="ghost"
                   onClick={() => onNavigate(slideNumber)}
                   className={cn(
-                    "flex w-full gap-2.5 rounded-xl px-2 py-2 text-left transition-[background-color]",
+                    "h-auto w-full justify-start gap-2.5 rounded-xl px-2 py-2 text-left",
                     isActive
-                      ? "bg-surface-tertiary"
+                      ? "bg-surface-tertiary hover:bg-surface-tertiary"
                       : "hover:bg-surface-tertiary/50",
                   )}
                 >
@@ -111,7 +116,7 @@ export function SlideOutlinePanel({
                       {entry.id}
                     </span>
                   </span>
-                </button>
+                </Button>
               </li>
             );
           })}

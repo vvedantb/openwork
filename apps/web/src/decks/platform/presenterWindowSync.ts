@@ -1,7 +1,7 @@
 /** Cross-window sync between the stage (screen share) and presenter pop-out. */
 
-export const PRESENTER_CHANNEL = "vmem-slides-presenter";
-export const PRESENTER_WINDOW_NAME = "vmem-presenter";
+const PRESENTER_CHANNEL = "vmem-slides-presenter";
+const PRESENTER_WINDOW_NAME = "vmem-presenter";
 
 export type PresenterChannelMessage =
   | { type: "slide"; slide: number }

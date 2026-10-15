@@ -86,7 +86,6 @@ const config: Config = {
       },
       fontFamily: {
         sans: ["Instrument Sans", "system-ui", "sans-serif"],
-        instrumentSerif: ["Instrument Serif", "Georgia", "serif"],
         instrumentSans: ["Instrument Sans", "system-ui", "sans-serif"],
         inter: ["Inter", "system-ui", "sans-serif"],
       },

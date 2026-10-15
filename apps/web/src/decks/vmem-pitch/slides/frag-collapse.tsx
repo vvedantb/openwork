@@ -198,27 +198,31 @@ export function SlideFragmentCollapse() {
         ))}
 
         {/* Outer nodes — crossfade between connectors and models on phase flip. */}
-        {POS.map((p, i) => (
-          <At key={i} l={p.l} t={p.t}>
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={phase}
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9 }}
-                transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
-              >
-                <NodePill {...nodes[i]} />
-              </motion.div>
-            </AnimatePresence>
-          </At>
-        ))}
+        {POS.map((p, i) => {
+          const node = nodes[i];
+          if (!node) return null;
+          return (
+            <At key={i} l={p.l} t={p.t}>
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={phase}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                  transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
+                >
+                  <NodePill {...node} />
+                </motion.div>
+              </AnimatePresence>
+            </At>
+          );
+        })}
 
         {/* vmem hub — always centred, painted last so dots converge behind it. */}
         <At l={CENTER.l} t={CENTER.t}>
           <div className="inline-flex items-center gap-2 whitespace-nowrap rounded-full bg-foreground px-5 py-2.5 text-background">
             <VmemDrawInIcon size={20} className="shrink-0 text-background" />
-            <span className="font-instrumentSerif text-xl leading-none text-background">
+            <span className="text-xl font-semibold leading-none text-background">
               v<span className="italic">mem</span>
             </span>
           </div>

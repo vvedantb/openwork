@@ -1,8 +1,15 @@
 import { motion } from "motion/react";
 import { useMutation, useQuery } from "convex/react";
 import { IconCheck } from "@tabler/icons-react";
-import { cn, motionDuration, motionEase } from "@/decks/platform/ui";
+import { toast } from "sonner";
+import { Button, cn, motionDuration, motionEase } from "@/decks/platform/ui";
 import { api } from "backend/convex/_generated/api";
+import { convexErrorMessage } from "@/decks/platform/convexError";
+import {
+  applyClearPollVotesOptimistic,
+  applySendVoteOptimistic,
+  applyTogglePollOptionOptimistic,
+} from "@/decks/platform/convexOptimistic";
 import {
   SlideShell,
   SlideKicker,
@@ -49,9 +56,15 @@ export function SlidePoll({
     api.presentations.getMyPollSelections,
     sessionCode ? { code: sessionCode, pollId, participantKey } : "skip",
   );
-  const sendVote = useMutation(api.presentations.sendVote);
-  const togglePollOption = useMutation(api.presentations.togglePollOption);
-  const clearPollVotes = useMutation(api.presentations.clearPollVotes);
+  const sendVote = useMutation(api.presentations.sendVote).withOptimisticUpdate(
+    applySendVoteOptimistic,
+  );
+  const togglePollOption = useMutation(
+    api.presentations.togglePollOption,
+  ).withOptimisticUpdate(applyTogglePollOptionOptimistic);
+  const clearPollVotes = useMutation(
+    api.presentations.clearPollVotes,
+  ).withOptimisticUpdate(applyClearPollVotesOptimistic);
 
   const selectedSet = new Set(mySelections ?? []);
 
@@ -62,7 +75,9 @@ export function SlidePoll({
       pollId,
       participantKey,
       optionId,
-    }).catch(() => undefined);
+    }).catch((err: Error) => {
+      toast.error(convexErrorMessage(err, "Could not record vote"));
+    });
   };
 
   const voteMulti = (optionId: string) => {
@@ -72,7 +87,9 @@ export function SlidePoll({
       pollId,
       participantKey,
       optionId,
-    }).catch(() => undefined);
+    }).catch((err: Error) => {
+      toast.error(convexErrorMessage(err, "Could not update vote"));
+    });
   };
 
   const resetPoll = () => {
@@ -81,7 +98,9 @@ export function SlidePoll({
       code: sessionCode,
       hostKey,
       pollId,
-    }).catch(() => undefined);
+    }).catch((err: Error) => {
+      toast.error(convexErrorMessage(err, "Could not reset poll"));
+    });
   };
 
   const countByOption = new Map(
@@ -104,15 +123,16 @@ export function SlidePoll({
           const pct = total > 0 ? (count / total) * 100 : 0;
           const mine = selectedSet.has(option.id);
           return (
-            <button
+            <Button
               key={option.id}
               type="button"
+              variant="ghost"
               disabled={!live}
               onClick={() =>
                 multiSelect ? voteMulti(option.id) : voteSingle(option.id)
               }
               className={cn(
-                "relative w-full overflow-hidden rounded-2xl px-5 py-4 text-left transition-[background-color]",
+                "relative h-auto w-full overflow-hidden rounded-2xl px-5 py-4 text-left",
                 live
                   ? "cursor-pointer hover:bg-surface-tertiary/70"
                   : "cursor-default",
@@ -144,7 +164,7 @@ export function SlidePoll({
                   </span>
                 )}
               </div>
-            </button>
+            </Button>
           );
         })}
       </div>
@@ -161,13 +181,14 @@ export function SlidePoll({
             : "Share the deck to collect live votes."}
         </p>
         {live && hostKey ? (
-          <button
+          <Button
             type="button"
+            variant="link"
             onClick={resetPoll}
-            className="text-sm text-muted underline-offset-2 transition-[color] hover:text-foreground hover:underline"
+            className="h-auto p-0 text-sm text-muted hover:text-foreground"
           >
             Reset poll
-          </button>
+          </Button>
         ) : null}
       </SlideReveal>
     </SlideShell>

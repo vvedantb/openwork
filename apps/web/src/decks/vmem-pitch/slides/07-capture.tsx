@@ -1,6 +1,10 @@
 import type { SlideIcon } from "@/decks/vmem-pitch/tabler-icon";
-import { IconBrandChrome, IconDeviceMobile } from "@tabler/icons-react";
-import { IconChat, IconFiles } from "@/components/sidebar-icons";
+import {
+  IconBrandChrome,
+  IconDeviceMobile,
+  IconMessage as IconChat,
+} from "@tabler/icons-react";
+import { IconFiles } from "@/components/sidebar-icons";
 import { BlurWordsTitle } from "../components/BlurWordsTitle";
 import { CaptureSourcesPanel } from "../components/CaptureSourcesPanel";
 import {

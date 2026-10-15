@@ -10,6 +10,7 @@ import { SlideOutlinePanel } from "./SlideOutlinePanel";
 
 const DESIGN_W = 1280;
 const DESIGN_H = 720;
+// Default gap between auto-revealed build steps; per-slide `staggerMs` overrides.
 const DEFAULT_STAGGER_MS = 1000;
 
 function readDocumentTheme(): "dark" | "light" {
@@ -21,11 +22,22 @@ function readDocumentTheme(): "dark" | "light" {
     : "dark";
 }
 
+function getSlide(slides: SlideEntry[], index: number): SlideEntry {
+  const entry = slides[index];
+  if (!entry) {
+    throw new Error(`Unknown slide index ${index}`);
+  }
+  return entry;
+}
+
 interface SlideDeckProps {
   slides: SlideEntry[];
+  /** 1-based current slide index. */
   slide: number;
   onNavigate: (slide: number) => void;
+  /** When false, keyboard / click navigation is disabled (stage follows presenter pop-out). */
   allowNavigation?: boolean;
+  /** PowerPoint-style slide list on the left. */
   showOutline?: boolean;
 }
 
@@ -40,26 +52,40 @@ export function SlideDeck({
   allowNavigation = true,
   showOutline = true,
 }: SlideDeckProps) {
+  "use no memo";
   const total = slides.length;
   const containerRef = useRef<HTMLDivElement>(null);
   const stageAreaRef = useRef<HTMLDivElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
-  const initialThemeRef = useRef(readDocumentTheme());
   const [scale, setScale] = useState(1);
+  // The theme <html> had on mount, so we can restore it when leaving the deck.
+  const initialThemeRef = useRef(readDocumentTheme());
+  // Transition direction (1 = forward, -1 = back), derived from the change in
+  // the `slide` prop rather than set only inside `go`. Deriving it means
+  // externally driven changes — a viewer following a live presenter — also
+  // animate in the correct direction, not just the local presenter's clicks.
   const prevSlideRef = useRef(slide);
   const direction = slide >= prevSlideRef.current ? 1 : -1;
+  // Current build step within the active slide (ephemeral — not in URL).
+  // Auto-advances on a timer (see effect below) so each slide's content
+  // reveals in a stagger without the presenter clicking through it.
   const [step, setStep] = useState(0);
 
-  const index = clamp(slide - 1, 0, Math.max(total - 1, 0));
+  const index = clamp(slide - 1, 0, total - 1);
 
+  // Track the last rendered slide so `direction` (derived above) reflects the
+  // next change. Runs after paint, so the current render still sees the prior
+  // value and computes the right enter/exit direction.
   useEffect(() => {
     prevSlideRef.current = slide;
   }, [slide]);
 
+  // Auto-play the slide's build steps: reset to 0 on slide change, then reveal
+  // each step in turn on a fixed stagger so nothing pops in all at once.
   useEffect(() => {
     setStep(0);
-    const entry = slides[clamp(slide - 1, 0, Math.max(total - 1, 0))];
-    if (!entry || entry.steps === 0) return;
+    const entry = getSlide(slides, clamp(slide - 1, 0, total - 1));
+    if (entry.steps === 0) return;
     const stagger = entry.staggerMs ?? DEFAULT_STAGGER_MS;
     const timers: number[] = [];
     for (let s = 1; s <= entry.steps; s++) {
@@ -68,6 +94,12 @@ export function SlideDeck({
     return () => timers.forEach((t) => window.clearTimeout(t));
   }, [slide, slides, total]);
 
+  /**
+   * Navigate between slides. Build steps auto-play on a timer (see above), so
+   * forward/back move whole slides — no per-step clicking.
+   *  delta > 0 = next slide, delta < 0 = previous slide.
+   *  delta omitted with a slide number = jump directly (Home/End).
+   */
   const go = useCallback(
     (next: number, opts?: { delta?: number }) => {
       const delta = opts?.delta;
@@ -83,6 +115,7 @@ export function SlideDeck({
     [slide, onNavigate, total],
   );
 
+  // Compute scale from the stage area (excludes the outline sidebar).
   useEffect(() => {
     const el = stageAreaRef.current;
     if (!el) return;
@@ -99,6 +132,7 @@ export function SlideDeck({
     return () => observer.disconnect();
   }, []);
 
+  // Keyboard navigation (presenter pop-out drives when disabled on stage).
   useEffect(() => {
     if (!allowNavigation) return;
     function onKey(e: KeyboardEvent) {
@@ -136,8 +170,11 @@ export function SlideDeck({
     return () => window.removeEventListener("keydown", onKey);
   }, [slide, go, allowNavigation, total]);
 
+  // Click left/right thirds
   function handleStageClick(e: React.MouseEvent<HTMLDivElement>) {
     if (!allowNavigation) return;
+    // Don't navigate when the click lands on an interactive element
+    // inside a slide (e.g. the mock memory-graph nodes).
     if (
       e.target instanceof Element &&
       e.target.closest('button, a, [role="button"]')
@@ -154,14 +191,18 @@ export function SlideDeck({
     }
   }
 
-  const entry = slides[index];
-  if (!entry) {
-    return null;
-  }
-
-  const { Component, theme, id } = entry;
+  const { Component, theme, id } = getSlide(slides, index);
+  // No deck orbs on the opener (pure black) or the title (it has its own
+  // LandingAmbientGraph atmosphere). With both orb-free, the black↔title
+  // transition has no orb change in either direction — so the orbs never
+  // fade in/out over those slides and can't flash. They appear from slide 02.
   const showOrbs = id !== "00" && id !== "01";
 
+  // Force the slide's theme on <html> while presenting. A local wrapper class
+  // is not enough: opacity-modified token utilities (text-foreground/50) and
+  // `dark:` variants resolve against the html-level theme. We re-apply on every
+  // <html> class mutation via an observer so nothing else can clobber it; on
+  // unmount we hand control back by restoring the theme <html> had on mount.
   useEffect(() => {
     const root = document.documentElement;
     const opposite = theme === "dark" ? "light" : "dark";
@@ -220,6 +261,7 @@ export function SlideDeck({
         ref={stageAreaRef}
         className={`relative flex min-w-0 flex-1 items-center justify-center overflow-hidden ${theme}`}
       >
+        {/* Scaled stage */}
         <div
           ref={stageRef}
           style={{
@@ -232,6 +274,16 @@ export function SlideDeck({
           onClick={handleStageClick}
           role="presentation"
         >
+          {/* Ambient orb glows — inside the stage so they're part of the
+            slide composition and scale with it. Dark slides get soft white
+            orbs; light slides get a gentler warm cream aura (a black glow
+            on a light background reads as smog).
+
+            Always mounted; visibility is a plain CSS opacity transition (not
+            framer) because framer didn't reliably re-animate this persistent
+            layer across slide changes. Off on the opener + title so the
+            black↔title boundary never toggles the orbs (no flash); they fade
+            in/out only at the slide-02 boundary, gently over 1.6s. */}
           <div
             className="pointer-events-none absolute inset-0 transition-opacity duration-[1600ms] ease-in-out"
             aria-hidden
@@ -285,6 +337,7 @@ export function SlideDeck({
           </AnimatePresence>
         </div>
 
+        {/* Progress bar — outside scaled stage so it's always full width */}
         <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-0.5 bg-foreground/5">
           <div
             className="h-full bg-foreground/25 transition-[width] duration-300"
@@ -292,6 +345,7 @@ export function SlideDeck({
           />
         </div>
 
+        {/* Slide counter */}
         <div className="pointer-events-none absolute bottom-3 right-4 font-mono text-xs tabular-nums text-muted/40">
           {slide} / {total}
         </div>

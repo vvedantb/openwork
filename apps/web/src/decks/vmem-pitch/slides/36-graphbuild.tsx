@@ -297,6 +297,7 @@ export function Slide36GraphBuild() {
           {OUTER_EDGES.map(([a, b], i) => {
             const na = OUTER_NODES[a];
             const nb = OUTER_NODES[b];
+            if (!na || !nb) return null;
             return (
               <motion.line
                 key={`outer-edge-${a}-${b}`}
@@ -321,7 +322,9 @@ export function Slide36GraphBuild() {
           {/* Bridges from the outer field into the inner example nodes */}
           {BRIDGES.map(({ outer, sat }, i) => {
             const na = OUTER_NODES[outer];
-            const p = zoomedPoint(SATELLITES[sat].l, SATELLITES[sat].t);
+            const satNode = SATELLITES[sat];
+            if (!na || !satNode) return null;
+            const p = zoomedPoint(satNode.l, satNode.t);
             return (
               <motion.line
                 key={`bridge-${outer}-${sat}`}

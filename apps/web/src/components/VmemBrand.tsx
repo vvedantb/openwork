@@ -4,7 +4,7 @@ import { cn } from "@/decks/platform/ui";
 import { VmemDrawInIcon } from "@/components/svg-animations";
 
 const brandTextClassName =
-  "text-xl leading-none font-instrumentSerif text-foreground";
+  "text-lg font-semibold leading-none tracking-tight text-foreground";
 
 export function VmemBrandText({ className }: { className?: string }) {
   return (

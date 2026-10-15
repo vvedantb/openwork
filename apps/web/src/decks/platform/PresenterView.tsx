@@ -25,6 +25,10 @@ interface PresenterViewProps {
   updateSearch: (next: { slide?: number; session?: string }) => void;
 }
 
+/**
+ * Pop-out presenter window — current slide (left) + script (right). Drives
+ * the stage window via BroadcastChannel; never screen-shared.
+ */
 export function PresenterView({
   deck,
   deckPath,
@@ -57,14 +61,13 @@ export function PresenterView({
 
   useEffect(() => {
     postPresenterMessage({ type: "presenter-open" });
-    postPresenterMessage({ type: "slide", slide: current });
     const onUnload = () => postPresenterMessage({ type: "presenter-closed" });
     window.addEventListener("beforeunload", onUnload);
     return () => {
       window.removeEventListener("beforeunload", onUnload);
       postPresenterMessage({ type: "presenter-closed" });
     };
-  }, [current]);
+  }, []);
 
   useEffect(() => {
     postPresenterMessage({ type: "slide", slide: current });
@@ -115,7 +118,7 @@ export function PresenterView({
 
   return (
     <PresentationDeckProvider value={deckContext}>
-      <div className="flex h-screen flex-col bg-background text-foreground">
+      <div className="flex h-dvh flex-col bg-background text-foreground">
         <header className="flex shrink-0 items-center gap-2 px-4 py-2.5">
           <IconNotes size={18} className="shrink-0 text-muted" />
           <div className="min-w-0 flex-1">
@@ -147,7 +150,8 @@ export function PresenterView({
                 </p>
               ) : (
                 <p className="text-sm leading-relaxed text-muted">
-                  No script for this slide.
+                  No script for this slide — edit{" "}
+                  <span className="font-mono text-xs">speakerNotes.ts</span>.
                 </p>
               )}
             </div>
