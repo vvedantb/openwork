@@ -1,5 +1,11 @@
 # Changelog
 
+## OpenWork rename - 2026-10-15
+
+- Renamed the product from OpenDesign to OpenWork across package name, page title, header wordmark, landing copy and agent docs
+- Added a README describing OpenWork as a platform for agent-created presentations, reports, posters and animations
+- Corrected agent docs: the deck catalog lives at `/decks`, not `/`
+
 ## Slide deployment platform - 2026-07-06
 
 - Replaced the Folio web editor with a code-defined slide platform — decks live in the repo and deploy via git/Vercel
