@@ -13,12 +13,12 @@ Implementation:
 - Minimize surface area of change; co-locate logic where it belongs
 - Prefer explicit over magical behaviour
 
-OpenDesign (primary product):
+OpenWork (primary product):
 
 - Decks are **code-defined** in `apps/web/src/decks/` — edit slides locally in git, deploy via Vercel
 - **Registry:** `apps/web/src/decks/registry.ts` maps deck IDs to manifests (`SlideEntry[]`, speaker notes, theme)
 - **Presenter:** `/d/$deckId` — fullscreen web presenter with keyboard nav, step-gated builds, optional live sync
-- **Catalog:** `/` lists registered decks
+- **Catalog:** `/decks` lists registered decks (`/` is the landing page)
 - **Shared shell:** `apps/web/src/decks/platform/` — `SlideDeck`, `SlideShell`, `PresenterView`, sync hooks
 - **Themes:** `apps/web/src/decks/themes/` — motion tokens and UI variables (Tailwind on deck routes)
 - Adding a deck: new folder under `decks/` + one entry in `registry.ts`

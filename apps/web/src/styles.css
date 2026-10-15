@@ -3,7 +3,7 @@
 @import "./fonts/geist-pixel.css";
 
 /* =========================================================================
-   OpenDesign — editorial slide platform aesthetic
+   OpenWork — editorial presentation platform aesthetic
    Paper + ink dual context. Geist Pixel display, Geist sans, Geist Mono.
    Vermillion accent (#C2410C).
    ========================================================================= */
@@ -1374,7 +1374,7 @@ button {
    Entrance animations
    ========================================================================= */
 
-@keyframes opendesign-rise {
+@keyframes openwork-rise {
   from {
     opacity: 0;
     transform: translateY(12px);
@@ -1387,7 +1387,7 @@ button {
 
 .stagger > * {
   opacity: 0;
-  animation: opendesign-rise 700ms var(--ease-out) forwards;
+  animation: openwork-rise 700ms var(--ease-out) forwards;
 }
 
 .stagger > *:nth-child(1) {

@@ -30,10 +30,10 @@ function RootLayout() {
   return (
     <div className="app-shell">
       <header className="app-header">
-        <Link to="/" className="brand" aria-label="OpenDesign home">
+        <Link to="/" className="brand" aria-label="OpenWork home">
           <span className="brand-mark" aria-hidden="true" />
           <span className="brand-wordmark">
-            Open<em>Design</em>
+            Open<em>Work</em>
           </span>
         </Link>
         <nav aria-label="Site">
