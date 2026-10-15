@@ -4,7 +4,6 @@ import { motion } from "motion/react";
 import type { Variants } from "motion/react";
 import {
   IconBolt,
-  IconBook2,
   IconBrowser,
   IconCode,
   IconDeviceMobile,
@@ -28,7 +27,6 @@ import {
 import { SlideShell } from "@/decks/platform/SlideShell";
 import {
   HistoryMockup,
-  WikiMockup,
   FileTreeMockup,
   McpMockup,
   WebMockup,
@@ -141,7 +139,7 @@ function BentoTile({
         ) : null}
         <div className="min-w-0">
           <h3
-            className={`font-instrumentSerif text-2xl font-normal leading-tight tracking-tight ${titleColor}`}
+            className={`text-2xl font-semibold leading-tight tracking-tight ${titleColor}`}
           >
             {title}
           </h3>
@@ -182,7 +180,7 @@ function BentoTile({
       ) : null}
 
       <h3
-        className={`font-instrumentSerif text-2xl font-normal leading-tight tracking-tight ${titleColor}`}
+        className={`text-2xl font-semibold leading-tight tracking-tight ${titleColor}`}
       >
         {title}
       </h3>
@@ -256,21 +254,13 @@ export function Slide13Bento() {
           </BentoCell>
           <BentoCell
             from={{ y: 220, x: -60 }}
-            className="col-span-1 row-span-2"
+            className="col-span-2 row-span-2"
           >
             <BentoTile
               title="Web"
               description="Browse, search, and curate."
               icon={IconLayoutDashboard}
               preview={<WebMockup />}
-            />
-          </BentoCell>
-          <BentoCell from={{ y: 220, x: 60 }} className="col-span-1 row-span-2">
-            <BentoTile
-              title="Wiki"
-              description="Long-form docs for your agent."
-              icon={IconBook2}
-              preview={<WikiMockup />}
             />
           </BentoCell>
           <BentoCell from={{ x: -240 }} className="col-span-1 row-span-2">

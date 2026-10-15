@@ -6,9 +6,6 @@ import {
   IconShieldLock,
 } from "@tabler/icons-react";
 import { BlurWordsTitle } from "../components/BlurWordsTitle";
-// Poll callback removed along with the poll slides:
-// import { PollCallback } from "../components/PollCallback";
-// import { POLL_PRIVACY } from "../components/pollDefs";
 import {
   SlideItem,
   SlideKicker,
@@ -92,12 +89,6 @@ export function Slide40Privacy() {
           </p>
         </div>
       </SlideReveal>
-
-      {/* Poll callback removed with the polls:
-      <SlideReveal step={2} delay={0.15} className="mt-5">
-        <PollCallback poll={POLL_PRIVACY} prefix="You said" />
-      </SlideReveal>
-      */}
     </SlideShell>
   );
 }

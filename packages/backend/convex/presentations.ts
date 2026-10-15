@@ -4,11 +4,28 @@ import {
   query,
   internalMutation,
   type MutationCtx,
+  type QueryCtx,
 } from "./_generated/server";
+import type { Doc } from "./_generated/dataModel";
 
+/**
+ * Live sharing for the `/slides` deck — "follow the presenter" (Teams-style),
+ * without take-control. The presenter is the sole driver: only the browser
+ * holding the secret `hostKey` (returned once from `createSession`) may move
+ * the deck. Viewers are anonymous — they subscribe to `getSession` and either
+ * follow `slide` live or detach to browse on their own.
+ *
+ * Every function is PUBLIC (the `/slides` route is reachable without sign-in).
+ * Deliberately lean: no auth, no presence, no names — just a session row,
+ * pruned daily.
+ */
+
+/** Idle (or ended) sessions older than this are pruned by the daily cron. */
 const SESSION_MAX_IDLE_MS = 24 * 60 * 60 * 1000;
+/** Length of the generated share code (hex chars from a UUID). */
 const CODE_LENGTH = 7;
 
+/** One count per (participant, option) — drops duplicate rows from races / legacy data. */
 function tallyPollVotes(
   votes: Array<{
     participantKey: string;
@@ -24,6 +41,24 @@ function tallyPollVotes(
     counts.set(vote.optionId, (counts.get(vote.optionId) ?? 0) + 1);
   }
   return { counts, total: seen.size };
+}
+
+async function getSessionByCode(
+  ctx: QueryCtx | MutationCtx,
+  code: string,
+): Promise<Doc<"presentationSessions"> | null> {
+  return await ctx.db
+    .query("presentationSessions")
+    .withIndex("by_code", (q) => q.eq("code", code))
+    .first();
+}
+
+async function patchSession(
+  ctx: MutationCtx,
+  session: Doc<"presentationSessions">,
+  patch: Partial<Pick<Doc<"presentationSessions">, "slide" | "status">>,
+): Promise<void> {
+  await ctx.db.patch(session._id, { ...patch, lastActiveAt: Date.now() });
 }
 
 async function deleteParticipantOptionVotes(
@@ -50,23 +85,33 @@ async function deleteParticipantOptionVotes(
   }
 }
 
+/**
+ * A hex code is number-like when it contains only digits (`1234567`) or forms
+ * scientific notation (`4952e29`). The web router's default search parser
+ * JSON-parses `?session=` values, turning such codes into numbers and breaking
+ * the share link, so we reject them. Any non-`e` hex letter (a/b/c/d/f) makes
+ * the code safe.
+ */
 function isNumberLikeCode(code: string): boolean {
   return /^\d+(e\d+)?$/.test(code);
 }
 
+/** Generate a short, URL-friendly share code, retrying on collision. */
 async function generateUniqueCode(ctx: MutationCtx): Promise<string> {
   for (let attempt = 0; attempt < 8; attempt++) {
     const code = crypto.randomUUID().replace(/-/g, "").slice(0, CODE_LENGTH);
     if (isNumberLikeCode(code)) continue;
-    const existing = await ctx.db
-      .query("presentationSessions")
-      .withIndex("by_code", (q) => q.eq("code", code))
-      .first();
+    const existing = await getSessionByCode(ctx, code);
     if (!existing) return code;
   }
   throw new Error("Could not generate a unique session code");
 }
 
+/**
+ * Start sharing the current deck. Returns the `code` (goes in the share URL)
+ * and the secret `hostKey` (kept in the presenter's localStorage and required
+ * to drive / stop the session — never exposed to viewers).
+ */
 export const createSession = mutation({
   args: { slide: v.number() },
   returns: v.object({ code: v.string(), hostKey: v.string() }),
@@ -84,6 +129,11 @@ export const createSession = mutation({
   },
 });
 
+/**
+ * Live view of a session for every client. Deliberately omits `hostKey` (the
+ * drive token). Returns null when the code has no session; an ended session
+ * still resolves so viewers see it stopped.
+ */
 export const getSession = query({
   args: { code: v.string() },
   returns: v.union(
@@ -94,50 +144,45 @@ export const getSession = query({
     v.null(),
   ),
   handler: async (ctx, args) => {
-    const session = await ctx.db
-      .query("presentationSessions")
-      .withIndex("by_code", (q) => q.eq("code", args.code))
-      .first();
+    const session = await getSessionByCode(ctx, args.code);
     if (!session) return null;
     return { slide: session.slide, status: session.status };
   },
 });
 
+/** Move the deck. Silently no-ops unless the caller holds the host key. */
 export const setSlide = mutation({
   args: { code: v.string(), hostKey: v.string(), slide: v.number() },
   returns: v.null(),
   handler: async (ctx, args) => {
-    const session = await ctx.db
-      .query("presentationSessions")
-      .withIndex("by_code", (q) => q.eq("code", args.code))
-      .first();
-    if (!session || session.hostKey !== args.hostKey) return null;
-    if (session.status !== "live") return null;
-    await ctx.db.patch(session._id, {
-      slide: args.slide,
-      lastActiveAt: Date.now(),
-    });
+    const session = await getSessionByCode(ctx, args.code);
+    if (
+      !session ||
+      session.hostKey !== args.hostKey ||
+      session.status !== "live"
+    ) {
+      return null;
+    }
+    await patchSession(ctx, session, { slide: args.slide });
     return null;
   },
 });
 
+/** End the share for everyone. Host-key gated. */
 export const stopSharing = mutation({
   args: { code: v.string(), hostKey: v.string() },
   returns: v.null(),
   handler: async (ctx, args) => {
-    const session = await ctx.db
-      .query("presentationSessions")
-      .withIndex("by_code", (q) => q.eq("code", args.code))
-      .first();
+    const session = await getSessionByCode(ctx, args.code);
     if (!session || session.hostKey !== args.hostKey) return null;
-    await ctx.db.patch(session._id, {
-      status: "ended",
-      lastActiveAt: Date.now(),
-    });
+    await patchSession(ctx, session, { status: "ended" });
     return null;
   },
 });
 
+/**
+ * Single-choice poll: replaces any prior pick for this participant.
+ */
 export const sendVote = mutation({
   args: {
     code: v.string(),
@@ -147,10 +192,7 @@ export const sendVote = mutation({
   },
   returns: v.null(),
   handler: async (ctx, args) => {
-    const session = await ctx.db
-      .query("presentationSessions")
-      .withIndex("by_code", (q) => q.eq("code", args.code))
-      .first();
+    const session = await getSessionByCode(ctx, args.code);
     if (!session || session.status !== "live") return null;
 
     const prior = await ctx.db
@@ -171,11 +213,14 @@ export const sendVote = mutation({
       participantKey: args.participantKey,
       optionId: args.optionId,
     });
-    await ctx.db.patch(session._id, { lastActiveAt: Date.now() });
+    await patchSession(ctx, session, {});
     return null;
   },
 });
 
+/**
+ * Multi-select poll: tap to toggle one option on or off for this participant.
+ */
 export const togglePollOption = mutation({
   args: {
     code: v.string(),
@@ -185,10 +230,7 @@ export const togglePollOption = mutation({
   },
   returns: v.null(),
   handler: async (ctx, args) => {
-    const session = await ctx.db
-      .query("presentationSessions")
-      .withIndex("by_code", (q) => q.eq("code", args.code))
-      .first();
+    const session = await getSessionByCode(ctx, args.code);
     if (!session || session.status !== "live") return null;
 
     const existing = await ctx.db
@@ -211,11 +253,12 @@ export const togglePollOption = mutation({
         optionId: args.optionId,
       });
     }
-    await ctx.db.patch(session._id, { lastActiveAt: Date.now() });
+    await patchSession(ctx, session, {});
     return null;
   },
 });
 
+/** This browser's current picks for one poll (source of truth for checkmarks). */
 export const getMyPollSelections = query({
   args: {
     code: v.string(),
@@ -244,16 +287,19 @@ export const getMyPollSelections = query({
   },
 });
 
+/** Presenter-only: wipe all votes for one poll in this session (fresh tally). */
 export const clearPollVotes = mutation({
   args: { code: v.string(), hostKey: v.string(), pollId: v.string() },
   returns: v.null(),
   handler: async (ctx, args) => {
-    const session = await ctx.db
-      .query("presentationSessions")
-      .withIndex("by_code", (q) => q.eq("code", args.code))
-      .first();
-    if (!session || session.hostKey !== args.hostKey) return null;
-    if (session.status !== "live") return null;
+    const session = await getSessionByCode(ctx, args.code);
+    if (
+      !session ||
+      session.hostKey !== args.hostKey ||
+      session.status !== "live"
+    ) {
+      return null;
+    }
 
     const votes = await ctx.db
       .query("presentationVotes")
@@ -264,11 +310,15 @@ export const clearPollVotes = mutation({
     for (const vote of votes) {
       await ctx.db.delete(vote._id);
     }
-    await ctx.db.patch(session._id, { lastActiveAt: Date.now() });
+    await patchSession(ctx, session, {});
     return null;
   },
 });
 
+/**
+ * Live tally for one poll. Returns a count per option id that has votes, plus
+ * the total; the slide zero-fills options nobody picked yet.
+ */
 export const pollResults = query({
   args: { code: v.string(), pollId: v.string() },
   returns: v.object({
@@ -293,6 +343,7 @@ export const pollResults = query({
   },
 });
 
+/** One-off GC for duplicate vote rows (races / legacy single-select data). */
 export const dedupePollVotesInternal = internalMutation({
   args: {},
   returns: v.object({ removed: v.number() }),
@@ -313,6 +364,10 @@ export const dedupePollVotesInternal = internalMutation({
   },
 });
 
+/**
+ * Daily GC — drop ended or long-idle sessions and their votes so the tables
+ * stay small. Wired into `crons.ts`.
+ */
 export const pruneStaleInternal = internalMutation({
   args: {},
   returns: v.null(),

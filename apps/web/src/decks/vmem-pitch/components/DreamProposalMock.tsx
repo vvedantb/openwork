@@ -236,6 +236,7 @@ export function DreamProposalMock() {
   }, []);
 
   const proposal = PROPOSALS[index];
+  if (!proposal) return null;
   const Icon = proposal.icon;
 
   return (

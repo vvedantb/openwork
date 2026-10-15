@@ -14,11 +14,15 @@ function clamp(value: number, min: number, max: number): number {
 
 interface SlideMiniPreviewProps {
   slides: SlideEntry[];
+  /** 1-based slide index. */
   slideNumber: number;
+  /** Build step to render; defaults to the slide's final step. */
   buildStep?: number;
+  /** Optional label above the thumbnail. */
   label?: string;
 }
 
+/** Small 16:9 read-only slide thumbnail for the presenter pop-out. */
 export function SlideMiniPreview({
   slides,
   slideNumber,
@@ -27,15 +31,6 @@ export function SlideMiniPreview({
 }: SlideMiniPreviewProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(0.25);
-
-  const index = clamp(slideNumber - 1, 0, slides.length - 1);
-  const entry = slides[index];
-  if (!entry) {
-    return null;
-  }
-
-  const step = buildStep ?? entry.steps;
-  const { Component, theme } = entry;
 
   useEffect(() => {
     const el = containerRef.current;
@@ -52,11 +47,22 @@ export function SlideMiniPreview({
     return () => observer.disconnect();
   }, []);
 
+  const index = clamp(slideNumber - 1, 0, slides.length - 1);
+  const entry = slides[index];
+  if (!entry) return null;
+  const step = buildStep ?? entry.steps;
+  const { Component, theme } = entry;
+
   return (
     <div className="space-y-1.5">
       {label ? <p className="text-xs font-medium text-muted">{label}</p> : null}
       <div
         ref={containerRef}
+        // `text-foreground` pins a themed colour baseline on this dark/light
+        // container. Some slides use `text-foreground/<alpha>`, which Tailwind
+        // drops to an invalid colour rule; without a baseline here those
+        // elements inherit colour from the light presenter chrome and render
+        // black on dark slides. Setting it means they inherit the right colour.
         className={`relative aspect-video w-full overflow-hidden rounded-xl bg-background text-foreground ${theme}`}
       >
         <div

@@ -1,11 +1,6 @@
 import type { SlideIcon } from "@/decks/vmem-pitch/tabler-icon";
 import { IconUser } from "@tabler/icons-react";
-import {
-  IconTeams,
-  IconSkills,
-  IconWiki,
-  IconFiles,
-} from "@/components/sidebar-icons";
+import { IconTeams, IconSkills, IconFiles } from "@/components/sidebar-icons";
 import { BlurWordsTitle } from "../components/BlurWordsTitle";
 import {
   SlideShell,
@@ -27,11 +22,6 @@ const sharedContent: SharedContentItem[] = [
     desc: "Instructions any AI follows.",
   },
   {
-    icon: IconWiki,
-    label: "Wiki",
-    desc: "A shared knowledge base.",
-  },
-  {
     icon: IconFiles,
     label: "Files",
     desc: "Shared, searchable files.",
@@ -47,8 +37,8 @@ export function Slide10Workspaces() {
       <BlurWordsTitle lines={["Personal and shared memory."]} size="xl" />
       <SlideReveal delay={0.08} className="mt-6 max-w-2xl">
         <SlideBody>
-          Each workspace keeps its own memories. Teams share skills, wiki, and
-          files — your personal memories stay private.
+          Each workspace keeps its own memories. Teams share skills and files —
+          your personal memories stay private.
         </SlideBody>
       </SlideReveal>
 
@@ -68,7 +58,7 @@ export function Slide10Workspaces() {
           <ul className="space-y-2">
             {[
               "Private memories",
-              "Personal skills and wiki",
+              "Personal skills",
               "Own chat threads",
               "Syncs to browser and phone",
             ].map((item) => (
@@ -99,7 +89,7 @@ export function Slide10Workspaces() {
           <ul className="space-y-2">
             {[
               "Shared memories for all members",
-              "Team-wide skills and wiki",
+              "Team-wide skills",
               "Shared file drive",
               "Any member can create + edit",
             ].map((item) => (

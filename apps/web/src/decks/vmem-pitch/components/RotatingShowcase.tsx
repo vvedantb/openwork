@@ -39,6 +39,13 @@ const POSES = [
   },
 ] as const;
 
+type Pose = (typeof POSES)[number];
+
+function poseAt(index: number): Pose {
+  const pose = POSES[index % POSES.length];
+  return pose ?? POSES[0];
+}
+
 export interface ShowcasePanelData {
   src: string;
   label: string;
@@ -151,7 +158,7 @@ export function RotatingShowcase({
             key={panel.src}
             src={panel.src}
             label={panel.label}
-            pose={POSES[(i + offset) % POSES.length]}
+            pose={poseAt(i + offset)}
             delay={0.25 + i * 0.25}
             floatY={8 + i * 2}
             floatDuration={6 + i}

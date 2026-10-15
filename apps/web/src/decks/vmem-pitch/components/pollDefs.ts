@@ -1,10 +1,9 @@
 /**
- * Shared poll definitions — single source of truth for the poll slides AND the
- * `PollCallback` chips that reference a poll's live results later in the deck.
+ * Shared poll definitions for the parked poll slides.
  * Keep `pollId` stable: votes are scoped by (session code, pollId).
  */
 
-export interface PollOption {
+interface PollOption {
   id: string;
   label: string;
 }

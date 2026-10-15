@@ -42,16 +42,16 @@ export function PresentationHostBar({
   return (
     <Popover onOpenChange={onOpenChange}>
       <PopoverTrigger asChild>
-        <button
+        <Button
           type="button"
-          className="inline-flex items-center gap-2 rounded-full bg-surface-secondary/90 px-3.5 py-2 text-sm font-medium text-foreground shadow-lg backdrop-blur transition-[background-color] hover:bg-surface-tertiary"
+          className="inline-flex h-auto items-center gap-2 rounded-full bg-surface-secondary/90 px-3.5 py-2 text-sm font-medium text-foreground shadow-lg backdrop-blur hover:bg-surface-tertiary hover:text-foreground"
         >
           <span className="relative flex h-2 w-2">
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-500/70" />
             <span className="relative inline-flex h-2 w-2 rounded-full bg-red-500" />
           </span>
           Live
-        </button>
+        </Button>
       </PopoverTrigger>
       <PopoverContent align="end" className="w-72 space-y-3">
         <div className="space-y-1.5">

@@ -15,7 +15,12 @@ import "@/decks/deck-globals.css";
 
 const searchSchema = z.object({
   slide: z.number().int().min(1).optional().default(1),
+  // `z.coerce` guards against number-like codes (e.g. `4952e29`, which the
+  // router's default `parseSearch` JSON-parses into a number before this runs):
+  // coercing back to a string keeps the page from crashing on validation. New
+  // codes are generated to never look like numbers (see `generateUniqueCode`).
   session: z.coerce.string().optional(),
+  /** `presenter` = pop-out window with notes + controls. */
   view: z.enum(["presenter"]).optional(),
 });
 
@@ -85,6 +90,7 @@ interface StageViewProps {
   updateSearch: (next: { slide?: number; session?: string }) => void;
 }
 
+/** Full-screen deck for projection / screen sharing. */
 function StageView({
   deck,
   deckPath: path,
@@ -124,6 +130,7 @@ function StageView({
     sync.sessionState !== "notfound" &&
     !sync.isHost;
   const canDrive = !isFollower;
+  /** Solo rehearsal or live host only — never on a coworker's share-link tab. */
   const canOpenPresenter = session === undefined || sync.isHost;
   const stageNavigation = canDrive && !presenterDetached;
 

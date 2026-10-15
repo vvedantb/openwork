@@ -1,6 +1,12 @@
 import { useCallback, useEffect, useState } from "react";
 import { useMutation, useQuery } from "convex/react";
+import { toast } from "sonner";
 import { api } from "backend/convex/_generated/api";
+import { convexErrorMessage } from "./convexError";
+import {
+  applySetSlideOptimistic,
+  applyStopSharingOptimistic,
+} from "./convexOptimistic";
 
 /**
  * Live "follow the presenter" sync for the `/slides` deck (Teams-style, no
@@ -30,14 +36,18 @@ function readParticipantKey(): string {
 }
 
 interface UsePresentationSyncArgs {
+  /** Current slide from the URL (`?slide=`). */
   slide: number;
+  /** Share code from the URL (`?session=`), if any. */
   sessionCode: string | undefined;
+  /** Patch the URL search params (slide and/or session). */
   updateSearch: (next: { slide?: number; session?: string }) => void;
+  /** Deck route path (`/d/<deckId>`) used to build the share link. */
   deckPath: string;
 }
 
 /** Viewer-facing lifecycle of the session being watched. */
-export type SessionState =
+type SessionState =
   | "none" // not sharing — solo deck
   | "loading" // joined, awaiting first server read
   | "live" // active, presenter driving
@@ -82,8 +92,12 @@ export function usePresentationSync({
   );
 
   const createSessionMut = useMutation(api.presentations.createSession);
-  const setSlideMut = useMutation(api.presentations.setSlide);
-  const stopSharingMut = useMutation(api.presentations.stopSharing);
+  const setSlideMut = useMutation(
+    api.presentations.setSlide,
+  ).withOptimisticUpdate(applySetSlideOptimistic);
+  const stopSharingMut = useMutation(
+    api.presentations.stopSharing,
+  ).withOptimisticUpdate(applyStopSharingOptimistic);
 
   const [isStarting, setIsStarting] = useState(false);
 
@@ -109,7 +123,9 @@ export function usePresentationSync({
       if (isHost && hostKey && sessionCode) {
         updateSearch({ slide: target });
         void setSlideMut({ code: sessionCode, hostKey, slide: target }).catch(
-          () => undefined,
+          (err: Error) => {
+            toast.error(convexErrorMessage(err, "Could not sync slide"));
+          },
         );
         return;
       }
@@ -134,14 +150,20 @@ export function usePresentationSync({
       }
       setHostKey(result.hostKey);
       updateSearch({ session: result.code });
-    } finally {
-      setIsStarting(false);
+    } catch (err) {
+      const fallback = "Could not start sharing";
+      toast.error(
+        err instanceof Error ? convexErrorMessage(err, fallback) : fallback,
+      );
     }
+    setIsStarting(false);
   }, [createSessionMut, slide, updateSearch]);
 
   const stopSharing = useCallback(async () => {
     if (!sessionCode || !hostKey) return;
-    await stopSharingMut({ code: sessionCode, hostKey }).catch(() => undefined);
+    await stopSharingMut({ code: sessionCode, hostKey }).catch((err: Error) => {
+      toast.error(convexErrorMessage(err, "Could not stop sharing"));
+    });
     if (typeof window !== "undefined") {
       window.localStorage.removeItem(hostKeyStorage(sessionCode));
     }
