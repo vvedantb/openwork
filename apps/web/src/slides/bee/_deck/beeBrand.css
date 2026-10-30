@@ -1,0 +1,46 @@
+/* Bee's deck: honey accents, Bee's own typeface and a warm cream stage, ported
+   from Eva's globals.css. Bee's `Shell` (DeckText.tsx) puts both classes on
+   every slide, so the stage, the outline and the presenter previews all match
+   without touching the shared `SlideDeck`.
+
+   Instrument Sans (SIL OFL 1.1, public/fonts/instrument-sans) is self-hosted
+   under its own family name. Deck routes already load "Instrument Sans" from
+   Google Fonts (index.html); reusing that name here would swap the font file
+   every other deck renders with. */
+@font-face {
+  font-family: "Bee Instrument Sans";
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url("/fonts/instrument-sans/instrument-sans-latin.woff2") format("woff2");
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
+    U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212,
+    U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "Bee Instrument Sans";
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url("/fonts/instrument-sans/instrument-sans-latin-ext.woff2")
+    format("woff2");
+  unicode-range:
+    U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304,
+    U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB,
+    U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+.deck-brand-bee {
+  /* Honey from Bee's logo, deep enough to read as text on cream. */
+  --deck-brand-a: #f2a516;
+  --deck-brand-b: #c27406;
+  --deck-brand-c: #ffd75e;
+  font-family:
+    "Bee Instrument Sans", "Instrument Sans", ui-sans-serif, system-ui,
+    sans-serif;
+}
+/* Warm cream instead of zinc, and Bee's dark ink. */
+.deck-stage-bee {
+  background-color: #fbf6ec;
+  color: #2a1e0c;
+}

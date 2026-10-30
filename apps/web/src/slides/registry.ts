@@ -1,8 +1,10 @@
 import type { DeckManifest } from "./types";
 import { introToVmemDeck } from "./intro-to-vmem";
+import { beeDeck } from "./bee";
 
 export const DECKS: Record<string, DeckManifest> = {
   [introToVmemDeck.id]: introToVmemDeck,
+  [beeDeck.id]: beeDeck,
 };
 
 export const DECK_LIST = Object.values(DECKS);
