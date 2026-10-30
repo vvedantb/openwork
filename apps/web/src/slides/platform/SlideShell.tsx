@@ -210,3 +210,42 @@ export function SlideBody({ children, className = "" }: SlideBodyProps) {
     </p>
   );
 }
+
+interface SlideBulletsProps {
+  items: string[];
+}
+
+/**
+ * Dotted bullet list. Softens the foreground with `opacity-*` because colour
+ * alpha (`text-foreground/80`) emits no CSS with the `var(--…)` tokens.
+ */
+export function SlideBullets({ items }: SlideBulletsProps) {
+  return (
+    <ul className="mt-6 space-y-4">
+      {items.map((item) => (
+        <li key={item} className="flex items-start gap-3">
+          <span
+            aria-hidden
+            className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-foreground opacity-40"
+          />
+          <span className="text-base leading-relaxed text-foreground opacity-80">
+            {item}
+          </span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+interface SlideTagProps {
+  children: ReactNode;
+}
+
+/** Small pill label, e.g. one item in a row of technologies. */
+export function SlideTag({ children }: SlideTagProps) {
+  return (
+    <span className="inline-flex items-center rounded-full bg-default px-3 py-1 text-xs font-medium text-default-foreground">
+      {children}
+    </span>
+  );
+}
