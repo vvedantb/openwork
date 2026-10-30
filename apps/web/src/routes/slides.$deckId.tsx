@@ -23,7 +23,22 @@ const searchSchema = z.object({
   session: z.coerce.string().optional(),
   /** `presenter` = pop-out window with notes + controls. */
   view: z.enum(["presenter"]).optional(),
+  // `?embed=1` (or `true`) = slide stage only, for iframing on other sites.
+  // The router JSON-parses these to `1` / `true`. Keeping that raw value (not
+  // a boolean) means navigation writes `embed=1` back to the URL unchanged.
+  embed: z.literal([1, true]).optional(),
 });
+
+/** Framed by another page (e.g. an `<iframe>` embed). */
+function isInIframe(): boolean {
+  try {
+    return window.self !== window.top;
+  } catch {
+    // Some browsers throw when reading a cross-origin `top` — only possible
+    // inside a frame.
+    return true;
+  }
+}
 
 export const Route = createFileRoute("/slides/$deckId")({
   validateSearch: searchSchema,
@@ -44,7 +59,7 @@ export const Route = createFileRoute("/slides/$deckId")({
 function DeckPresenterPage() {
   const { deckId } = Route.useParams();
   const deck = getDeck(deckId);
-  const { slide, session, view } = Route.useSearch();
+  const { slide, session, view, embed } = Route.useSearch();
   const path = deckPath(deckId);
   const navigate = useNavigate({ from: "/slides/$deckId" });
 
@@ -84,6 +99,7 @@ function DeckPresenterPage() {
         slide={slide}
         session={session}
         updateSearch={updateSearch}
+        embed={embed !== undefined || isInIframe()}
       />
     </div>
   );
@@ -95,6 +111,8 @@ interface StageViewProps {
   slide: number;
   session: string | undefined;
   updateSearch: (next: { slide?: number; session?: string }) => void;
+  /** Stage only — no slide outline or share / presenter controls. */
+  embed: boolean;
 }
 
 /** Full-screen deck for projection / screen sharing. */
@@ -104,6 +122,7 @@ function StageView({
   slide,
   session,
   updateSearch,
+  embed,
 }: StageViewProps) {
   const [presenterDetached, setPresenterDetached] = useState(false);
 
@@ -149,15 +168,17 @@ function StageView({
           slide={sync.effectiveSlide}
           onNavigate={sync.onNavigate}
           allowNavigation={stageNavigation}
-          showOutline={!presenterDetached}
+          showOutline={!presenterDetached && !embed}
         />
       </PresentationDeckProvider>
-      <PresentationControls
-        sync={sync}
-        canOpenPresenter={canOpenPresenter}
-        presenterDetached={presenterDetached}
-        onOpenPresenter={openPresenterWindow}
-      />
+      {embed ? null : (
+        <PresentationControls
+          sync={sync}
+          canOpenPresenter={canOpenPresenter}
+          presenterDetached={presenterDetached}
+          onOpenPresenter={openPresenterWindow}
+        />
+      )}
     </>
   );
 }
