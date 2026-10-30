@@ -10,7 +10,8 @@ import { SlideOutlinePanel } from "./SlideOutlinePanel";
 
 const DESIGN_W = 1280;
 const DESIGN_H = 720;
-// Default gap between auto-revealed build steps; per-slide `staggerMs` overrides.
+// Default gap between auto-revealed build steps; per-slide `staggerMs` or
+// `autoMs` overrides.
 const DEFAULT_STAGGER_MS = 1000;
 
 function readDocumentTheme(): "dark" | "light" {
@@ -81,15 +82,17 @@ export function SlideDeck({
   }, [slide]);
 
   // Auto-play the slide's build steps: reset to 0 on slide change, then reveal
-  // each step in turn on a fixed stagger so nothing pops in all at once.
+  // each step in turn on a stagger so nothing pops in all at once.
   useEffect(() => {
     setStep(0);
     const entry = getSlide(slides, clamp(slide - 1, 0, total - 1));
     if (entry.steps === 0) return;
     const stagger = entry.staggerMs ?? DEFAULT_STAGGER_MS;
     const timers: number[] = [];
+    let at = 0;
     for (let s = 1; s <= entry.steps; s++) {
-      timers.push(window.setTimeout(() => setStep(s), stagger * s));
+      at += entry.autoMs?.[s - 1] ?? stagger;
+      timers.push(window.setTimeout(() => setStep(s), at));
     }
     return () => timers.forEach((t) => window.clearTimeout(t));
   }, [slide, slides, total]);

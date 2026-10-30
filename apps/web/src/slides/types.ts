@@ -20,6 +20,12 @@ export interface SlideEntry {
    * slides with many quick steps so they do not drag.
    */
   staggerMs?: number;
+  /**
+   * Optional per-step waits (ms): entry i is the gap before step i + 1. Use it
+   * when one beat needs longer than the rest (a flight landing, a search being
+   * typed). Steps it does not cover fall back to `staggerMs`.
+   */
+  autoMs?: readonly number[];
 }
 
 export interface SpeakerNotesResult {
