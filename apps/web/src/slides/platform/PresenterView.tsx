@@ -136,7 +136,11 @@ export function PresenterView({
 
         <div className="flex min-h-0 flex-1">
           <div className="flex w-1/2 min-w-0 flex-col justify-center p-4">
-            <SlideMiniPreview slides={deck.slides} slideNumber={current} />
+            <SlideMiniPreview
+              slides={deck.slides}
+              slideNumber={current}
+              themeClassName={deck.themeClassName}
+            />
           </div>
 
           <div className="flex w-1/2 min-w-0 flex-col bg-surface-secondary/40">

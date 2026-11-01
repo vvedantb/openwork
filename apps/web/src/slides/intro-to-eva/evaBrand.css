@@ -1,0 +1,98 @@
+/* Eva's own look for the intro-to-eva deck: Inter, Eva's neutral palette and
+   real colour alpha, ported from Eva's globals.css and Tailwind colours.
+
+   Everything is scoped to `.deck-theme-eva` (the manifest's `themeClassName`).
+   SlideDeck and the presenter preview put that class on an ancestor of each
+   slide's `.light` / `.dark` element, so other decks keep OpenWork's theme.
+
+   Inter (SIL OFL 1.1, public/fonts/inter) is self-hosted under its own family
+   name, so it never replaces an "Inter" that another page loads. */
+@font-face {
+  font-family: "Eva Inter";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("/fonts/inter/InterVariable.woff2") format("woff2");
+}
+
+/* Eva's tokens, as RGB channels so `rgb(var(--eva-…) / <alpha>)` works.
+   Light is the default. Dark comes from the page (<html class="dark">, which
+   SlideDeck sets to the current slide's theme) or from a dark slide. Each
+   selector outranks a bare `.light` / `.dark`, so CSS order does not matter. */
+.deck-theme-eva,
+.deck-theme-eva .light {
+  --eva-background: 244 245 246;
+  --eva-foreground: 9 9 11;
+  --eva-card: 255 255 255;
+  --eva-primary: 9 9 11;
+  --eva-secondary: 234 235 236;
+  --eva-secondary-foreground: 23 25 27;
+  --eva-muted: 239 239 240;
+  --eva-muted-foreground: 100 101 103;
+  --eva-border: 221 222 223;
+}
+.dark .deck-theme-eva,
+.deck-theme-eva .dark {
+  --eva-background: 2 2 2;
+  --eva-foreground: 250 250 250;
+  --eva-card: 16 16 16;
+  --eva-primary: 250 250 250;
+  --eva-secondary: 32 32 32;
+  --eva-secondary-foreground: 252 252 252;
+  --eva-muted: 26 26 26;
+  --eva-muted-foreground: 159 160 162;
+  --eva-border: 36 36 36;
+}
+
+/* Point OpenWork's tokens at Eva's, so `bg-background`, `text-foreground`,
+   `text-muted` and `border-border` paint Eva's palette. A custom property
+   resolves its `var()` where it is declared, so these must sit on every
+   element that sets the channels above (same selectors). OpenWork's `muted`
+   is a text colour, so it takes Eva's `muted-foreground`. */
+.deck-theme-eva,
+.deck-theme-eva .light,
+.deck-theme-eva .dark {
+  --background: rgb(var(--eva-background));
+  --foreground: rgb(var(--eva-foreground));
+  --muted: rgb(var(--eva-muted-foreground));
+  --border: rgb(var(--eva-border));
+  color: var(--foreground);
+}
+
+/* Inter with Eva's default tracking (`--tracking-normal`). Optical sizing is
+   off so large titles keep the text cut of variable Inter rather than
+   switching to Display. The deck root also carries `font-sans`, hence the
+   compound selector. */
+.deck-theme-eva,
+.deck-theme-eva.font-sans,
+.deck-theme-eva .font-sans {
+  font-family: "Eva Inter", Inter, ui-sans-serif, system-ui, sans-serif;
+}
+.deck-theme-eva {
+  letter-spacing: -0.006em;
+  font-optical-sizing: none;
+}
+
+/* Eva's slides soften text with colour alpha (`text-foreground/70`). OpenWork's
+   Tailwind colours are bare `var(--…)`, so those classes emit no CSS. These
+   rules give them Eva's meaning: real alpha, not element opacity. */
+.deck-theme-eva .text-foreground\/60 {
+  color: rgb(var(--eva-foreground) / 0.6);
+}
+.deck-theme-eva .text-foreground\/70 {
+  color: rgb(var(--eva-foreground) / 0.7);
+}
+.deck-theme-eva .text-foreground\/80 {
+  color: rgb(var(--eva-foreground) / 0.8);
+}
+.deck-theme-eva .bg-foreground\/40 {
+  background-color: rgb(var(--eva-foreground) / 0.4);
+}
+
+/* OpenWork has no `secondary` colour; Eva's tags use it. */
+.deck-theme-eva .bg-secondary {
+  background-color: rgb(var(--eva-secondary));
+}
+.deck-theme-eva .text-secondary-foreground {
+  color: rgb(var(--eva-secondary-foreground));
+}
