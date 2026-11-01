@@ -6,7 +6,7 @@ import {
   SlideStagger,
   SlideItem,
   SlideTag,
-} from "@/slides/platform/SlideShell";
+} from "../components/SlideShell";
 
 export function Slide08Stack() {
   return (

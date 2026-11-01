@@ -169,6 +169,7 @@ function StageView({
           onNavigate={sync.onNavigate}
           allowNavigation={stageNavigation}
           showOutline={!presenterDetached && !embed}
+          themeClassName={deck.themeClassName}
         />
       </PresentationDeckProvider>
       {embed ? null : (

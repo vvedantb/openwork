@@ -1,6 +1,6 @@
 import { useContext } from "react";
 import { motion } from "motion/react";
-import { SlideStepContext } from "@/slides/platform/SlideShell";
+import { SlideStepContext } from "../components/SlideShell";
 import { motionEase } from "@/slides/platform/ui";
 
 /** Wordmark on entry; the tagline fades in at step 1. */

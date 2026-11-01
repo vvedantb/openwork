@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { motionDuration, motionEase } from "@/slides/platform/ui";
+import { cn, motionDuration, motionEase } from "@/slides/platform/ui";
 import type { SlideEntry } from "@/slides/types";
 import {
   SlideStepContext,
@@ -40,6 +40,8 @@ interface SlideDeckProps {
   allowNavigation?: boolean;
   /** PowerPoint-style slide list on the left. */
   showOutline?: boolean;
+  /** The deck's scoped theme class (`DeckManifest.themeClassName`). */
+  themeClassName?: string;
 }
 
 function clamp(value: number, min: number, max: number): number {
@@ -52,6 +54,7 @@ export function SlideDeck({
   onNavigate,
   allowNavigation = true,
   showOutline = true,
+  themeClassName,
 }: SlideDeckProps) {
   "use no memo";
   const total = slides.length;
@@ -251,7 +254,12 @@ export function SlideDeck({
   return (
     <div
       ref={containerRef}
-      className="fixed inset-0 flex overflow-hidden bg-background font-sans antialiased"
+      // The theme class sits above the stage area's `${theme}` class, so a
+      // deck theme can style each slide's light / dark tokens beneath it.
+      className={cn(
+        "fixed inset-0 flex overflow-hidden bg-background font-sans antialiased",
+        themeClassName,
+      )}
     >
       <SlideOutlinePanel
         slides={slides}

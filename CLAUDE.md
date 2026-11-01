@@ -25,6 +25,7 @@ OpenWork (primary product):
 - **Static assets:** `apps/web/public/media/<kind>/<id>/` (served at `/media/...`, excluded from SPA rewrites) — never under `/slides/`
 - **Legacy URLs:** `/d/:id` and `/decks` redirect via `apps/web/vercel.json` plus client routes; old deck ids map in `LEGACY_DECK_IDS`
 - Adding a deck: new folder under `slides/` + one entry in `registry.ts`
+- Per-deck theme: optional `DeckManifest.themeClassName` scopes a deck's own CSS (font, colour tokens) to its stage and presenter preview — e.g. `intro-to-eva/evaBrand.css`
 - No in-browser editor; no Clerk auth on deck routes (public presenter)
 
 Convex (live sync only):

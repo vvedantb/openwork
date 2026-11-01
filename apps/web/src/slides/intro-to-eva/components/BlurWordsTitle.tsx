@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 import { motion } from "motion/react";
 import type { Variants } from "motion/react";
 import { motionEase } from "@/slides/platform/ui";
-import { SlideStepContext } from "@/slides/platform/SlideShell";
+import { SlideStepContext } from "./SlideShell";
 
 // Matches the brand word "Eva" (case-insensitive) with optional trailing
 // punctuation, so a title word like "Eva." keeps its full stop unstyled.

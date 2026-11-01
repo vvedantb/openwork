@@ -6,7 +6,7 @@ import {
   SlideBullets,
   SlideStagger,
   SlideItem,
-} from "@/slides/platform/SlideShell";
+} from "../components/SlideShell";
 
 export function Slide09GitHub() {
   return (

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { cn } from "@/slides/platform/ui";
 import type { SlideEntry } from "@/slides/types";
 import {
   SlideStepContext,
@@ -20,6 +21,8 @@ interface SlideMiniPreviewProps {
   buildStep?: number;
   /** Optional label above the thumbnail. */
   label?: string;
+  /** The deck's scoped theme class (`DeckManifest.themeClassName`). */
+  themeClassName?: string;
 }
 
 /** Small 16:9 read-only slide thumbnail for the presenter pop-out. */
@@ -28,6 +31,7 @@ export function SlideMiniPreview({
   slideNumber,
   buildStep,
   label,
+  themeClassName,
 }: SlideMiniPreviewProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(0.25);
@@ -54,7 +58,9 @@ export function SlideMiniPreview({
   const { Component, theme } = entry;
 
   return (
-    <div className="space-y-1.5">
+    // The theme class wraps the `${theme}` container, as in SlideDeck, so a
+    // deck theme reaches the slide's light / dark tokens beneath it.
+    <div className={cn("space-y-1.5", themeClassName)}>
       {label ? <p className="text-xs font-medium text-muted">{label}</p> : null}
       <div
         ref={containerRef}

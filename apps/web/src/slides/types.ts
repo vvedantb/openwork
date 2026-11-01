@@ -37,4 +37,12 @@ export interface SpeakerNotesResult {
 export interface DeckManifest extends WorkSummary {
   slides: SlideEntry[];
   getSpeakerNotes: (slideNumber: number) => SpeakerNotesResult;
+  /**
+   * Optional class that turns on the deck's own scoped theme (font, colour
+   * tokens). SlideDeck and the presenter preview put it on an ancestor of the
+   * slide's `.light` / `.dark` element, so the deck's CSS can target
+   * `.<class> .light` and `.<class> .dark`. Decks without one use OpenWork's
+   * theme. Example: `intro-to-eva/evaBrand.css`.
+   */
+  themeClassName?: string;
 }
