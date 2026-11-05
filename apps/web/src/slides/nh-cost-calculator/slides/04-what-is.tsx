@@ -6,7 +6,7 @@ export function Slide04WhatIs() {
       <Bullets
         lines={[
           b(
-            "A state machine is a model that contains a finite set of a states, transitions, and actions based on events",
+            "A state machine is a model that contains a finite set of states, transitions, and actions based on events",
           ),
           gap,
           b("It is a very powerful tool for managing complex logic"),

@@ -3,7 +3,8 @@ import { TitleSlide } from "../components/slideKit";
 export function Slide01Title() {
   return (
     <TitleSlide
-      title="Using state machines for the NH cost calculator"
+      title="State machines with XState"
+      subtitle="Predictable UI state, one event at a time"
       author="Vedant Bhopatrao"
     />
   );

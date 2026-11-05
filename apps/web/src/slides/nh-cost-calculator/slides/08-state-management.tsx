@@ -19,8 +19,8 @@ export function Slide08StateManagement() {
             "By using state machines, we give control to the developers to reduce side effects and edge cases by enforcing strict state transitions",
           ),
           b("There are popular libraries that allow us to manage state"),
-          b("XState is what we use to create these state machines in code"),
-          b("Different types of state,"),
+          b("XState is one library for creating these state machines in code"),
+          b("Next: the different types of state"),
         ]}
       />
     </ContentSlide>

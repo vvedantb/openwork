@@ -1,18 +1,18 @@
 import { Bullets, ContentSlide, b, gap, plain } from "../components/slideKit";
 
-export function Slide16BenefitsReliable() {
+export function Slide15BenefitsReliable() {
   return (
-    <ContentSlide title="Benefits of NH implementation vs DC">
+    <ContentSlide title="State machine approach: benefits">
       <Bullets
         size="sm"
         lines={[
-          b("Faster calculations due to reduced complexity"),
+          b("Less complex logic to run on each change"),
           b("Easier to understand the logic as it’s simpler and more readable"),
           b(
-            "A state machine is essentially flowchart that’s being enforced in code – the user can only move through predefined valid paths",
+            "A state machine is essentially a flowchart that’s being enforced in code – the user can only move through predefined valid paths",
           ),
           b("Changes follow a strict path"),
-          b("Invalid state are impossible to enter by design"),
+          b("Invalid states are impossible to enter by design"),
           gap,
           plain("Reduced future maintenance"),
           plain("+ Faster to implement features"),

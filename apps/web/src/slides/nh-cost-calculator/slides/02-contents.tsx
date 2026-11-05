@@ -12,8 +12,8 @@ export function Slide02Contents() {
           b("What is state management?"),
           b("Types of state"),
           b("Introducing XState"),
-          b("Reviewing NH implementation with XState (and its pros)"),
-          b("DC implementation with the traditional approach (and its cons)"),
+          b("Worked example: a fictional cart with a state machine"),
+          b("The same cart with a free-form approach (and its risks)"),
         ]}
       />
     </ContentSlide>

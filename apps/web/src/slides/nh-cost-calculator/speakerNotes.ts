@@ -2,8 +2,8 @@ import { SLIDES } from "@/slides/nh-cost-calculator/slides";
 import type { SpeakerNotesResult } from "@/slides/types";
 
 /**
- * Presenter script — one entry per slide `id` in `slides/index.ts`, copied
- * verbatim from the source PowerPoint's speaker notes ("" where it had none).
+ * Presenter script — one entry per slide `id` in `slides/index.ts`.
+ * Public deck: keep notes empty or generic; no company or product detail.
  * Rendered with `whitespace-pre-wrap` in presenter view.
  */
 const SPEAKER_NOTES: Record<string, string> = {
@@ -25,9 +25,6 @@ const SPEAKER_NOTES: Record<string, string> = {
   "16": "",
   "17": "",
   "18": "",
-  "19": "",
-  "20": "",
-  "21": "",
 };
 
 export function getSpeakerNotes(slideNumber: number): SpeakerNotesResult {
