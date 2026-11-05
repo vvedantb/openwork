@@ -6,6 +6,16 @@
       "destination": "/slides/intro-to-vmem",
       "permanent": false
     },
+    {
+      "source": "/d/nh-cost-calculator",
+      "destination": "/slides/state-machines",
+      "permanent": false
+    },
+    {
+      "source": "/slides/nh-cost-calculator",
+      "destination": "/slides/state-machines",
+      "permanent": false
+    },
     { "source": "/d/:id", "destination": "/slides/:id", "permanent": false },
     { "source": "/decks", "destination": "/slides", "permanent": false }
   ],

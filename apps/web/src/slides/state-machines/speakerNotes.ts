@@ -1,4 +1,4 @@
-import { SLIDES } from "@/slides/nh-cost-calculator/slides";
+import { SLIDES } from "@/slides/state-machines/slides";
 import type { SpeakerNotesResult } from "@/slides/types";
 
 /**
