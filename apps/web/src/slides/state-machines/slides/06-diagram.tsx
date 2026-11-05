@@ -24,7 +24,7 @@ export function Slide06Diagram() {
           />
         </div>
         <Figure
-          src="/media/slides/nh-cost-calculator/slide06-1.webp"
+          src="/media/slides/state-machines/slide06-1.webp"
           alt="Hand-drawn key: a circle labelled state, an arrow labelled transition, and events/actions as what causes the transition"
           className="w-[440px]"
         />
