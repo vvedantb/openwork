@@ -1,15 +1,15 @@
 import { Bullets, b } from "./slideKit";
 
-/** Fill-in-the-blanks recap shared by the last two slides (same in source). */
+/** Fill-in-the-blanks recap for the final slide. */
 export function QuizLines() {
   return (
     <Bullets
       lines={[
-        b("State machine is ____"),
+        b("A state machine is ____"),
         b("They are used to ___"),
-        b("Used in NH implementation so that ___"),
-        b("DC implementation uses ____"),
-        b("Benefit it provides over DC implementation is ____"),
+        b("In the cart machine, events are processed ___"),
+        b("The free-form cart spreads its state across ____"),
+        b("Two risks of the free-form approach are ____ and ____"),
         b("More benefits of state machines include: _____"),
       ]}
     />

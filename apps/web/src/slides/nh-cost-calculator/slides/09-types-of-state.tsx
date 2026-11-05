@@ -14,11 +14,11 @@ export function Slide09TypesOfState() {
           b("Global state"),
           sub("Shared across multiple components"),
           sub(
-            "E.g. Calculator row component and Details calculation component on cost calculator",
+            "E.g. the line-item list and the totals panel on a shopping cart page",
           ),
           sub("Usually managed using libraries (e.g. XState)"),
           gap,
-          b("URL state (e.g. /sent-supas/?page=2)"),
+          b("URL state (e.g. /orders?page=2)"),
         ]}
       />
     </ContentSlide>

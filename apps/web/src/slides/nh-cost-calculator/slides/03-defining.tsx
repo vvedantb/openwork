@@ -9,7 +9,7 @@ export function Slide03Defining() {
             "A state in software is used to represent all the data that can change on a page",
           ),
           b(
-            "State represents all the data that changes during between the open and close periods",
+            "State represents all the data that changes between opening and closing a page",
           ),
           b(
             "State describes what the system is doing and how it should behave",

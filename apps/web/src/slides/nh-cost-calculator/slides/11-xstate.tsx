@@ -6,14 +6,12 @@ export function Slide11XState() {
       <Bullets
         size="sm"
         lines={[
-          b(
-            "XState is a library that we use to create and manage state machines",
-          ),
+          b("XState is a library for creating and managing state machines"),
           b(
             "Its main purpose is to ensure structured, predictable, and scalable state management",
           ),
           b(
-            "We use Xstate to create state machines in code (well abstractions of it at least)",
+            "You use XState to define state machines in code (well, abstractions of them at least)",
           ),
           b("It offers developers a simpler way to define complex state logic"),
           b(

@@ -8,23 +8,20 @@ import { Slide06Diagram } from "./06-diagram";
 import { Slide07DiagramExample } from "./07-diagram-example";
 import { Slide08StateManagement } from "./08-state-management";
 import { Slide09TypesOfState } from "./09-types-of-state";
-import { Slide10TypesOfStateDiagram } from "./10-types-of-state-diagram";
+import { Slide10ComponentTree } from "./10-component-tree";
 import { Slide11XState } from "./11-xstate";
-import { Slide12NhImplementation } from "./12-nh-implementation";
-import { Slide13DcImplementation } from "./13-dc-implementation";
-import { Slide14BenefitsState } from "./14-benefits-state";
-import { Slide15BenefitsAtomic } from "./15-benefits-atomic";
-import { Slide16BenefitsReliable } from "./16-benefits-reliable";
-import { Slide17ConsRace } from "./17-cons-race";
-import { Slide18ConsIllegal } from "./18-cons-illegal";
-import { Slide19Summary } from "./19-summary";
-import { Slide20SummaryQuiz } from "./20-summary-quiz";
-import { Slide21SupaTracker } from "./21-supa-tracker";
+import { Slide12ExampleMachine } from "./12-example-machine";
+import { Slide13FreeForm } from "./13-free-form";
+import { Slide14BenefitsCentralised } from "./14-benefits-centralised";
+import { Slide15BenefitsReliable } from "./15-benefits-reliable";
+import { Slide16FreeFormRisks } from "./16-free-form-risks";
+import { Slide17Summary } from "./17-summary";
+import { Slide18RecapQuiz } from "./18-recap-quiz";
 
 export const SLIDES: SlideEntry[] = [
   {
     id: "01",
-    title: "Using state machines for the NH cost calculator",
+    title: "State machines with XState",
     theme: "dark",
     Component: Slide01Title,
     steps: 0,
@@ -87,9 +84,9 @@ export const SLIDES: SlideEntry[] = [
   },
   {
     id: "10",
-    title: "5. Types of state",
+    title: "5. Types of state: component tree",
     theme: "light",
-    Component: Slide10TypesOfStateDiagram,
+    Component: Slide10ComponentTree,
     steps: 0,
   },
   {
@@ -101,72 +98,51 @@ export const SLIDES: SlideEntry[] = [
   },
   {
     id: "12",
-    title: "Nursing homes implementation",
+    title: "7. Worked example: a cart machine",
     theme: "light",
-    Component: Slide12NhImplementation,
+    Component: Slide12ExampleMachine,
     steps: 0,
   },
   {
     id: "13",
-    title: "Domcare implementation",
+    title: "8. The same cart, free-form",
     theme: "light",
-    Component: Slide13DcImplementation,
+    Component: Slide13FreeForm,
     steps: 0,
   },
   {
     id: "14",
-    title: "Benefits of NH implementation vs DC",
+    title: "State machine approach: benefits",
     theme: "light",
-    Component: Slide14BenefitsState,
+    Component: Slide14BenefitsCentralised,
     steps: 0,
   },
   {
     id: "15",
-    title: "Benefits of NH implementation vs DC",
+    title: "State machine approach: benefits",
     theme: "light",
-    Component: Slide15BenefitsAtomic,
+    Component: Slide15BenefitsReliable,
     steps: 0,
   },
   {
     id: "16",
-    title: "Benefits of NH implementation vs DC",
+    title: "Free-form approach: risks",
     theme: "light",
-    Component: Slide16BenefitsReliable,
+    Component: Slide16FreeFormRisks,
     steps: 0,
   },
   {
     id: "17",
-    title: "Cons of DC implementation vs NH",
+    title: "Summary",
     theme: "light",
-    Component: Slide17ConsRace,
+    Component: Slide17Summary,
     steps: 0,
   },
   {
     id: "18",
-    title: "Cons of DC implementation vs NH",
+    title: "Recap",
     theme: "light",
-    Component: Slide18ConsIllegal,
-    steps: 0,
-  },
-  {
-    id: "19",
-    title: "Summary",
-    theme: "light",
-    Component: Slide19Summary,
-    steps: 0,
-  },
-  {
-    id: "20",
-    title: "Summary",
-    theme: "light",
-    Component: Slide20SummaryQuiz,
-    steps: 0,
-  },
-  {
-    id: "21",
-    title: "SUPA tracker",
-    theme: "light",
-    Component: Slide21SupaTracker,
+    Component: Slide18RecapQuiz,
     steps: 0,
   },
 ];
