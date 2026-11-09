@@ -1,0 +1,48 @@
+# PR / main gate. Typecheck and tests must run here — a test that never runs
+# has no value. Source-text tests (regex over source files) are banned; see
+# scripts/no-source-text-in-tests.mjs and CLAUDE.md (Tests).
+
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: typecheck / lint / test
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      HUSKY: "0"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      # Every step below runs even after an earlier one fails, so one push
+      # reports every problem instead of one per round trip.
+
+      - name: Typecheck
+        if: ${{ !cancelled() }}
+        run: pnpm typecheck
+
+      - name: Lint (no source-text in tests)
+        if: ${{ !cancelled() }}
+        run: pnpm lint
+
+      - name: Tests
+        if: ${{ !cancelled() }}
+        run: pnpm test

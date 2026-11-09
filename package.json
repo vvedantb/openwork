@@ -9,6 +9,8 @@
     "dev:backend": "pnpm --filter backend dev",
     "build": "pnpm --filter web build",
     "typecheck": "pnpm --filter web typecheck && pnpm --filter backend typecheck",
+    "lint": "node scripts/no-source-text-in-tests.mjs",
+    "test": "node --test scripts/no-source-text-in-tests.test.mjs",
     "codegen": "pnpm --filter backend codegen",
     "remotion:studio": "pnpm --filter web remotion:studio",
     "prepare": "husky"
