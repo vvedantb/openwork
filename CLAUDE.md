@@ -13,6 +13,13 @@ Implementation:
 - Minimize surface area of change; co-locate logic where it belongs
 - Prefer explicit over magical behaviour
 
+Tests:
+
+- Default is no new test
+- A test must call real code: import and call it, or render it
+- Never read or regex source files, CSS, or markdown in a test; if the rule is about code shape, add a lint rule
+- A regression test must fail on the old code and must run in CI (`pnpm test`)
+
 OpenWork (primary product):
 
 - Decks are **code-defined** in `apps/web/src/slides/` — edit slides locally in git, deploy via Vercel
