@@ -1,357 +1,143 @@
-/**
- * Ban tests that read repo source/CSS/markdown as text.
- *
- * Mirrors eva's `eva/no-source-text-in-tests` rule: a regex over source
- * breaks on every refactor and passes on real logic bugs. Import the code
- * and assert on what it returns or does. If the rule is about code shape,
- * write a lint rule instead.
- *
- * Usage:
- *   node scripts/no-source-text-in-tests.mjs
- *   import { checkTestSource, scanRepo } from "./no-source-text-in-tests.mjs"
- */
+#!/usr/bin/env node
+// Lint rule: test files must not read source, CSS, HTML or markdown text.
+// A test that greps a file proves the text exists, not that the code works.
+// Call the real code instead (import it, or render it).
+//
+// CLI: `node scripts/no-source-text-in-tests.mjs` from the repo root.
+// Exits 1 when any test file breaks the rule.
 
-import { readdirSync, readFileSync, statSync } from "node:fs";
-import { join, relative, resolve } from "node:path";
+import { readdirSync, readFileSync } from "node:fs";
+import { join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 
-export const MESSAGE =
-  "BANNED: tests that read source files as text. A regex over source breaks " +
-  "on every refactor and passes on real logic bugs. Import the code and assert " +
-  "on what it returns or does. If the rule is about code shape, write a lint " +
-  "rule instead. See CLAUDE.md (Tests).";
-
-const TEST_FILE = /\.test\.(ts|tsx|js|jsx|mjs|cjs)$/;
-/** Path or file name ending in a source/CSS/markdown extension. */
-const SOURCE_PATH = /[^/.][^/]*\.(?:ts|tsx|js|jsx|mjs|cjs|css|html|md)$/;
-/** File reads, plus helpers that wrap them (`read`, `readSource`, `sourceOf`). */
-const READ_CALLEE = /^(?:readFile(?:Sync)?|readSource|sourceOf|read|source)$/;
+const TEST_FILE = /\.test\.(?:ts|tsx|js|jsx|mjs|cjs)$/;
+const BANNED_PATH = /\.(?:ts|tsx|js|jsx|mjs|cjs|css|html|md)$/i;
+const READERS = new Set([
+  "readFileSync",
+  "readFile",
+  "read",
+  "readSource",
+  "source",
+  "sourceOf",
+]);
+const SKIP_DIRS = new Set([
+  "node_modules",
+  ".git",
+  "dist",
+  "build",
+  "coverage",
+  ".next",
+  ".turbo",
+  ".vercel",
+  ".agents",
+]);
 
 /**
- * Return violation objects for a single test file's source text.
- * Plain path strings used as test data (not passed to a read call) are allowed.
- *
- * @param {string} filename
- * @param {string} source
- * @returns {{ message: string, index: number, snippet: string }[]}
+ * Split source into identifier, punctuation and string tokens.
+ * Comments are dropped. Strings stay whole, so text inside a string
+ * or comment never looks like a call.
  */
-export function checkTestSource(filename, source) {
-  const normalized = filename.replaceAll("\\", "/");
-  if (!TEST_FILE.test(normalized)) return [];
-
-  /** @type {{ message: string, index: number, snippet: string }[]} */
-  const violations = [];
-
-  for (const call of findReadCalls(source)) {
-    const args = source.slice(call.openIndex + 1, call.closeIndex);
-    for (const stringMatch of args.matchAll(
-      /(["'])((?:\\.|(?!\1).)*)\1|`((?:\\`|[^`])*)`/g,
-    )) {
-      const value = stringMatch[2] ?? stringMatch[3] ?? "";
-      if (!SOURCE_PATH.test(value)) continue;
-      const index = call.openIndex + 1 + (stringMatch.index ?? 0);
-      violations.push({
-        message: MESSAGE,
-        index,
-        snippet: source.slice(index, index + Math.min(value.length + 2, 80)),
-      });
+function tokenize(text) {
+  const tokens = [];
+  let line = 1;
+  let i = 0;
+  while (i < text.length) {
+    const ch = text[i];
+    const next = text[i + 1];
+    if (ch === "\n") {
+      line++;
+      i++;
+    } else if (/\s/.test(ch)) {
+      i++;
+    } else if (ch === "/" && next === "/") {
+      while (i < text.length && text[i] !== "\n") i++;
+    } else if (ch === "/" && next === "*") {
+      const end = text.indexOf("*/", i + 2);
+      const stop = end === -1 ? text.length : end + 2;
+      for (; i < stop; i++) if (text[i] === "\n") line++;
+    } else if (ch === '"' || ch === "'" || ch === "`") {
+      const start = line;
+      let value = "";
+      i++;
+      while (i < text.length && text[i] !== ch) {
+        if (text[i] === "\\") {
+          value += text[i + 1] ?? "";
+          i += 2;
+          continue;
+        }
+        if (text[i] === "\n") line++;
+        value += text[i++];
+      }
+      i++;
+      tokens.push({ type: "str", value, line: start });
+    } else if (/[A-Za-z_$]/.test(ch)) {
+      let value = "";
+      while (i < text.length && /[\w$]/.test(text[i])) value += text[i++];
+      tokens.push({ type: "id", value, line });
+    } else {
+      tokens.push({ type: "punct", value: ch, line });
+      i++;
     }
   }
+  return tokens;
+}
 
+/** Return violations for one file. Non-test files return an empty list. */
+export function checkTestSource(filename, text) {
+  if (!TEST_FILE.test(filename)) return [];
+  const tokens = tokenize(text);
+  const violations = [];
+  for (let i = 0; i < tokens.length - 1; i++) {
+    const token = tokens[i];
+    if (token.type !== "id" || !READERS.has(token.value)) continue;
+    if (tokens[i + 1].value !== "(") continue;
+
+    // Inspect the first argument only: stop at a top-level comma.
+    let depth = 0;
+    for (let j = i + 1; j < tokens.length; j++) {
+      const t = tokens[j];
+      if (t.type === "punct") {
+        if ("([{".includes(t.value)) depth++;
+        else if (")]}".includes(t.value)) depth--;
+        else if (t.value === "," && depth === 1) break;
+        if (depth === 0) break;
+      } else if (t.type === "str" && BANNED_PATH.test(t.value)) {
+        violations.push({
+          file: filename,
+          line: token.line,
+          message: `${token.value}() reads "${t.value}". Call the real code instead of reading its text.`,
+        });
+        break;
+      }
+    }
+  }
   return violations;
 }
 
-/**
- * Find read-like call sites outside strings and comments.
- * @param {string} source
- * @returns {{ callee: string, openIndex: number, closeIndex: number }[]}
- */
-function findReadCalls(source) {
-  /** @type {{ callee: string, openIndex: number, closeIndex: number }[]} */
-  const calls = [];
-  let i = 0;
-  let inSingle = false;
-  let inDouble = false;
-  let inTemplate = false;
-  let inLineComment = false;
-  let inBlockComment = false;
-
-  while (i < source.length) {
-    const ch = source[i];
-    const next = source[i + 1];
-
-    if (inLineComment) {
-      if (ch === "\n") inLineComment = false;
-      i++;
-      continue;
-    }
-    if (inBlockComment) {
-      if (ch === "*" && next === "/") {
-        inBlockComment = false;
-        i += 2;
-        continue;
-      }
-      i++;
-      continue;
-    }
-    if (inSingle) {
-      if (ch === "\\") {
-        i += 2;
-        continue;
-      }
-      if (ch === "'") inSingle = false;
-      i++;
-      continue;
-    }
-    if (inDouble) {
-      if (ch === "\\") {
-        i += 2;
-        continue;
-      }
-      if (ch === '"') inDouble = false;
-      i++;
-      continue;
-    }
-    if (inTemplate) {
-      if (ch === "\\") {
-        i += 2;
-        continue;
-      }
-      if (ch === "`") inTemplate = false;
-      i++;
-      continue;
-    }
-    if (ch === "/" && next === "/") {
-      inLineComment = true;
-      i += 2;
-      continue;
-    }
-    if (ch === "/" && next === "*") {
-      inBlockComment = true;
-      i += 2;
-      continue;
-    }
-    if (ch === "'") {
-      inSingle = true;
-      i++;
-      continue;
-    }
-    if (ch === '"') {
-      inDouble = true;
-      i++;
-      continue;
-    }
-    if (ch === "`") {
-      inTemplate = true;
-      i++;
-      continue;
-    }
-
-    const ident = matchIdent(source, i);
-    if (ident && READ_CALLEE.test(ident.name)) {
-      const prev = source[i - 1];
-      // Skip property access like fs.readFileSync — still a read call; allow.
-      // Skip identifiers that are part of a larger name (already handled by matchIdent).
-      let j = ident.end;
-      while (j < source.length && /\s/.test(source[j] ?? "")) j++;
-      if (source[j] === "(") {
-        const closeIndex = findMatchingParen(source, j);
-        if (closeIndex >= 0) {
-          // MemberExpression property (fs.readFileSync) still counts — Eva does too.
-          void prev;
-          calls.push({
-            callee: ident.name,
-            openIndex: j,
-            closeIndex,
-          });
-          i = closeIndex + 1;
-          continue;
-        }
-      }
-    }
-
-    i++;
-  }
-
-  return calls;
-}
-
-/**
- * @param {string} source
- * @param {number} start
- * @returns {{ name: string, end: number } | null}
- */
-function matchIdent(source, start) {
-  const ch = source[start];
-  if (!ch || !/[A-Za-z_$]/.test(ch)) return null;
-  if (start > 0 && /[\w$]/.test(source[start - 1] ?? "")) return null;
-  let end = start + 1;
-  while (end < source.length && /[\w$]/.test(source[end] ?? "")) end++;
-  return { name: source.slice(start, end), end };
-}
-
-/**
- * @param {string} source
- * @param {number} openIndex index of "("
- */
-function findMatchingParen(source, openIndex) {
-  let depth = 0;
-  let inSingle = false;
-  let inDouble = false;
-  let inTemplate = false;
-  let inLineComment = false;
-  let inBlockComment = false;
-  for (let i = openIndex; i < source.length; i++) {
-    const ch = source[i];
-    const next = source[i + 1];
-    if (inLineComment) {
-      if (ch === "\n") inLineComment = false;
-      continue;
-    }
-    if (inBlockComment) {
-      if (ch === "*" && next === "/") {
-        inBlockComment = false;
-        i++;
-      }
-      continue;
-    }
-    if (inSingle) {
-      if (ch === "\\") {
-        i++;
-        continue;
-      }
-      if (ch === "'") inSingle = false;
-      continue;
-    }
-    if (inDouble) {
-      if (ch === "\\") {
-        i++;
-        continue;
-      }
-      if (ch === '"') inDouble = false;
-      continue;
-    }
-    if (inTemplate) {
-      if (ch === "\\") {
-        i++;
-        continue;
-      }
-      if (ch === "`") inTemplate = false;
-      continue;
-    }
-    if (ch === "/" && next === "/") {
-      inLineComment = true;
-      i++;
-      continue;
-    }
-    if (ch === "/" && next === "*") {
-      inBlockComment = true;
-      i++;
-      continue;
-    }
-    if (ch === "'") {
-      inSingle = true;
-      continue;
-    }
-    if (ch === '"') {
-      inDouble = true;
-      continue;
-    }
-    if (ch === "`") {
-      inTemplate = true;
-      continue;
-    }
-    if (ch === "(") depth++;
-    else if (ch === ")") {
-      depth--;
-      if (depth === 0) return i;
-    }
-  }
-  return -1;
-}
-
-/**
- * Recursively collect test files under `root`.
- * @param {string} root
- * @returns {string[]}
- */
-export function listTestFiles(root) {
-  const skip = new Set([
-    "node_modules",
-    ".git",
-    "dist",
-    "build",
-    ".vercel",
-    "coverage",
-  ]);
-  /** @type {string[]} */
-  const out = [];
-  /** @param {string} dir */
-  function walk(dir) {
-    let entries;
-    try {
-      entries = readdirSync(dir);
-    } catch {
-      return;
-    }
-    for (const name of entries) {
-      if (skip.has(name)) continue;
-      const full = join(dir, name);
-      let st;
-      try {
-        st = statSync(full);
-      } catch {
-        continue;
-      }
-      if (st.isDirectory()) walk(full);
-      else if (TEST_FILE.test(name)) out.push(full);
-    }
-  }
-  walk(root);
-  return out;
-}
-
-/**
- * Scan a repo root for banned source-text tests.
- * @param {string} root
- * @returns {{ file: string, message: string, snippet: string }[]}
- */
+/** Scan every test file under root. */
 export function scanRepo(root) {
-  /** @type {{ file: string, message: string, snippet: string }[]} */
-  const all = [];
-  for (const file of listTestFiles(root)) {
-    const source = readFileSync(file, "utf8");
-    for (const v of checkTestSource(file, source)) {
-      all.push({
-        file: relative(root, file),
-        message: v.message,
-        snippet: v.snippet,
-      });
+  const violations = [];
+  const walk = (dir) => {
+    for (const entry of readdirSync(dir, { withFileTypes: true })) {
+      const path = join(dir, entry.name);
+      if (entry.isDirectory()) {
+        if (!SKIP_DIRS.has(entry.name)) walk(path);
+      } else if (TEST_FILE.test(entry.name)) {
+        const name = relative(root, path);
+        violations.push(...checkTestSource(name, readFileSync(path, "utf8")));
+      }
     }
-  }
-  return all;
+  };
+  walk(root);
+  return violations;
 }
 
-function runCli() {
-  const root = process.cwd();
-  const violations = scanRepo(root);
-  if (violations.length === 0) {
-    console.log("no-source-text-in-tests: ok");
-    return;
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  const violations = scanRepo(process.cwd());
+  for (const v of violations) console.error(`${v.file}:${v.line}: ${v.message}`);
+  if (violations.length > 0) {
+    console.error(`\n${violations.length} violation(s). See "Tests:" in CLAUDE.md.`);
+    process.exit(1);
   }
-  for (const v of violations) {
-    console.error(`${v.file}: ${v.message}`);
-    console.error(`  ${v.snippet}`);
-  }
-  console.error(
-    `\n${violations.length} source-text test violation(s). Import and call real code instead.`,
-  );
-  process.exitCode = 1;
-}
-
-if (
-  process.argv[1] &&
-  fileURLToPath(import.meta.url) === resolve(process.argv[1])
-) {
-  runCli();
+  console.log("no-source-text-in-tests: ok");
 }

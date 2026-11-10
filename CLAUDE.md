@@ -15,10 +15,10 @@ Implementation:
 
 Tests:
 
-- Default is no new test. Do not add a test unless it protects a real regression or behaviour.
-- A test must import and call real code (or render a real component). Assert on return values, thrown errors, or observable behaviour.
-- Never read or regex source files, CSS, or markdown in a test (`readFileSync` of `src/…`, snapshotting file text, etc.). If the rule is about code shape, write a lint rule instead.
-- A regression test must fail on the old code and must run in CI (`pnpm test`). A test that nothing runs protects nothing.
+- Default is no new test
+- A test must call real code: import and call it, or render it
+- Never read or regex source files, CSS, or markdown in a test; if the rule is about code shape, add a lint rule
+- A regression test must fail on the old code and must run in CI (`pnpm test`)
 
 OpenWork (primary product):
 

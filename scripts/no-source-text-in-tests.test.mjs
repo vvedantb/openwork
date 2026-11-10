@@ -1,76 +1,70 @@
 import assert from "node:assert/strict";
-import { describe, it } from "node:test";
-import { checkTestSource, MESSAGE } from "./no-source-text-in-tests.mjs";
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { test } from "node:test";
 
-const testFile = "thing.test.ts";
+import { checkTestSource, scanRepo } from "./no-source-text-in-tests.mjs";
 
-describe("checkTestSource", () => {
-  it("flags readFileSync of a .ts source path", () => {
-    const source =
-      'const s = readFileSync(join(dir, "convex/mcp/tools.ts"), "utf8");\n';
-    const violations = checkTestSource(testFile, source);
-    assert.equal(violations.length, 1);
-    assert.equal(violations[0]?.message, MESSAGE);
-  });
+const check = (code) => checkTestSource("a.test.ts", code);
 
-  it("flags readSource of a .tsx file", () => {
-    const violations = checkTestSource(
-      testFile,
-      'const s = readSource("ThemeContext.tsx");\n',
-    );
-    assert.equal(violations.length, 1);
-  });
+test("flags reads of source, CSS, HTML and markdown", () => {
+  for (const file of ["x.ts", "x.tsx", "x.css", "x.html", "x.md", "x.mjs"]) {
+    const found = check(`const s = readFileSync("src/${file}", "utf8");`);
+    assert.equal(found.length, 1, file);
+    assert.equal(found[0].line, 1);
+  }
+});
 
-  it("flags read() of a .css path in a template literal", () => {
-    const violations = checkTestSource(
-      testFile,
-      "expect(read(`${dir}/app.css`)).toContain('x');\n",
-    );
-    assert.equal(violations.length, 1);
-  });
+test("flags other reader names and path helpers", () => {
+  assert.equal(check(`fs.readFile(join(root, "a.css"))`).length, 1);
+  assert.equal(check(`const t = readSource("a.tsx");`).length, 1);
+  assert.equal(check(`sourceOf(new URL("./a.ts", import.meta.url))`).length, 1);
+});
 
-  it("flags source() of an html file", () => {
-    const violations = checkTestSource(testFile, 'source("../index.html");\n');
-    assert.equal(violations.length, 1);
-  });
+test("reports the line of the call", () => {
+  const found = check(`import x from "y";\n\nreadFileSync("a.ts");`);
+  assert.equal(found[0].line, 3);
+});
 
-  it("flags read of markdown", () => {
-    const violations = checkTestSource(
-      testFile,
-      'readFileSync("README.md", "utf8");\n',
-    );
-    assert.equal(violations.length, 1);
-  });
+test("allows plain path strings as test data", () => {
+  assert.deepEqual(check(`const p = "src/app.tsx"; parse(p);`), []);
+});
 
-  it("allows path strings used as plain test data", () => {
-    const violations = checkTestSource(
-      testFile,
-      'expect(toPath("src/app.tsx")).toBe("app");\n',
-    );
-    assert.equal(violations.length, 0);
-  });
+test("allows imports of real code", () => {
+  assert.deepEqual(check(`import { run } from "../src/run.ts";`), []);
+});
 
-  it("allows importing modules", () => {
-    const violations = checkTestSource(
-      testFile,
-      'import { a } from "./a.ts";\n',
-    );
-    assert.equal(violations.length, 0);
-  });
+test("allows reading fixture.json", () => {
+  assert.deepEqual(check(`readFileSync("fixtures/fixture.json", "utf8")`), []);
+});
 
-  it("allows reading fixture.json", () => {
-    const violations = checkTestSource(
-      testFile,
-      'readFileSync(join(dir, "fixture.json"), "utf8");\n',
-    );
-    assert.equal(violations.length, 0);
-  });
+test("ignores matches inside strings and comments", () => {
+  assert.deepEqual(check(`const s = 'readFileSync("a.ts")';`), []);
+  assert.deepEqual(check(`// readFileSync("a.ts")`), []);
+  assert.deepEqual(check(`/* readFileSync("a.ts") */`), []);
+});
 
-  it("ignores non-test files", () => {
-    const violations = checkTestSource(
-      "helper.ts",
-      'readSource("convex/mcp/tools.ts");\n',
-    );
-    assert.equal(violations.length, 0);
-  });
+test("ignores non-test files", () => {
+  assert.deepEqual(
+    checkTestSource("helper.ts", `readFileSync("a.ts")`),
+    [],
+  );
+});
+
+test("scanRepo finds violations in test files and skips node_modules", () => {
+  const root = mkdtempSync(join(tmpdir(), "no-source-text-"));
+  try {
+    mkdirSync(join(root, "pkg"));
+    mkdirSync(join(root, "node_modules"));
+    writeFileSync(join(root, "pkg", "bad.test.mjs"), `readFileSync("a.css");`);
+    writeFileSync(join(root, "pkg", "ok.test.mjs"), `readFileSync("a.json");`);
+    writeFileSync(join(root, "node_modules", "dep.test.js"), `read("a.ts");`);
+
+    const found = scanRepo(root);
+    assert.equal(found.length, 1);
+    assert.equal(found[0].file, join("pkg", "bad.test.mjs"));
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
 });

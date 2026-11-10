@@ -1,7 +1,3 @@
-# PR / main gate. Typecheck and tests must run here — a test that never runs
-# has no value. Source-text tests (regex over source files) are banned; see
-# scripts/no-source-text-in-tests.mjs and CLAUDE.md (Tests).
-
 name: CI
 
 on:
@@ -9,40 +5,34 @@ on:
   push:
     branches: [main]
 
-concurrency:
-  group: ci-${{ github.workflow }}-${{ github.head_ref || github.ref }}
-  cancel-in-progress: true
+env:
+  # Skip the husky `prepare` hook during install.
+  HUSKY: "0"
 
 jobs:
-  check:
+  checks:
     name: typecheck / lint / test
     runs-on: ubuntu-latest
-    timeout-minutes: 20
-    env:
-      HUSKY: "0"
     steps:
       - uses: actions/checkout@v4
-
       - uses: pnpm/action-setup@v4
-
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: pnpm
-
       - run: pnpm install --frozen-lockfile
 
-      # Every step below runs even after an earlier one fails, so one push
-      # reports every problem instead of one per round trip.
-
+      # `!cancelled()` runs every check even if an earlier one fails,
+      # so one run reports all problems.
       - name: Typecheck
         if: ${{ !cancelled() }}
         run: pnpm typecheck
 
-      - name: Lint (no source-text in tests)
+      - name: Lint
         if: ${{ !cancelled() }}
         run: pnpm lint
 
+      # Tests run in CI because a test that nothing runs protects nothing.
       - name: Tests
         if: ${{ !cancelled() }}
         run: pnpm test
